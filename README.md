@@ -15,7 +15,7 @@ Pot Alert glows the edge of your screen in the color of the potion you need, and
 
 - Only alerts if the matching pot is in your inventory. Anti-venom and antifire can warn even when you have none left, so you know to teleport out.
 - In combat, it repeats until you sip. Out of combat, you get a short heads-up and then it goes quiet.
-- Combat starts when a hit lands or you get hit, not when you click an NPC.
+- Combat starts when your attack lands, not when you click an NPC or get hit running past monsters.
 - Quiet while the bank, deposit box or Grand Exchange is open.
 - After logging in, only prayer can alert until you fight or drink something. The prayer one can be turned off too.
 

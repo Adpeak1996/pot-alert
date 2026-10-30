@@ -23,10 +23,17 @@ public interface PotAlertConfig extends Config
 		return false;
 	}
 
+	@ConfigItem(keyName = "hitsCountAsCombat", name = "Getting hit counts as combat",
+		description = "When off, only your own attacks count as combat, so running past aggressive monsters won't set off alerts", section = generalSection, position = 1)
+	default boolean hitsCountAsCombat()
+	{
+		return false;
+	}
+
 	@Range(min = 1, max = 60)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "combatTimeout", name = "Combat timeout",
-		description = "How long after your last hit (landed or taken) you still count as in combat", section = generalSection, position = 1)
+		description = "How long after your last attack lands you still count as in combat", section = generalSection, position = 1)
 	default int combatTimeout()
 	{
 		return 10;

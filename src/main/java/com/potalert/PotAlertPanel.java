@@ -69,7 +69,7 @@ class PotAlertPanel extends PluginPanel
 		+ "&bull; Needs the pot in your inventory. Anti-venom and antifire warn anyway, so you know to tele out<br>"
 		+ "&bull; In combat, it repeats until you sip<br>"
 		+ "&bull; Out of combat, you get a short heads-up, then it goes quiet<br>"
-		+ "&bull; Combat starts when a hit lands, not when you click an NPC<br>"
+		+ "&bull; Combat starts when your attack lands, not when you click an NPC or get hit while running past monsters<br>"
 		+ "&bull; After logging in, only prayer can alert until you fight or drink a pot. You can turn the prayer one off too<br><br>"
 		+ "<font color='#ff981f'><b>Tips</b></font><br>"
 		+ "&bull; Set a pot's <i>Sound</i> to Off for glow only<br>"

@@ -325,11 +325,17 @@ public class PotAlertPlugin extends Plugin
 	@Subscribe
 	public void onHitsplatApplied(HitsplatApplied event)
 	{
-		if (event.getHitsplat().isMine())
+		if (!event.getHitsplat().isMine())
 		{
-			lastCombatTick = client.getTickCount();
-			waitingForFirstFight = false;
+			return;
 		}
+		boolean onMe = event.getActor() == client.getLocalPlayer();
+		if (onMe && !config.hitsCountAsCombat())
+		{
+			return;
+		}
+		lastCombatTick = client.getTickCount();
+		waitingForFirstFight = false;
 	}
 
 	@Subscribe
