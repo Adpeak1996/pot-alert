@@ -426,7 +426,6 @@ public class PotAlertPlugin extends Plugin
 		catch (Exception e)
 		{
 			log.warn("Pot Alert tick failed", e);
-			debug("ERROR", "crashed: " + e);
 		}
 	}
 
@@ -470,7 +469,6 @@ public class PotAlertPlugin extends Plugin
 			{
 				requestColor(potId);
 			}
-			String status;
 
 			if (firing && !reallyInCombat && state.idleStartTick < 0)
 			{
@@ -482,19 +480,15 @@ public class PotAlertPlugin extends Plugin
 			{
 				state.active = false;
 				state.idleStartTick = -1;
-				status = !enabled ? "off" : potId == null ? "no pot" : !inCombat ? "out of combat"
-					: needs && heldForLogin ? "waiting for a fight or a sip" : "fine";
 			}
 			else if (banking && !reallyInCombat)
 			{
 				state.active = true;
 				state.idleStartTick = tick - stopTicks;
-				status = "quiet (banking)";
 			}
 			else if (headsUpOver)
 			{
 				state.active = true;
-				status = "quiet (out of combat heads-up over)";
 			}
 			else
 			{
@@ -504,11 +498,7 @@ public class PotAlertPlugin extends Plugin
 				}
 				state.active = true;
 
-				if (!alertingPots.add(potId))
-				{
-					status = "ALERT (merged)";
-				}
-				else
+				if (alertingPots.add(potId))
 				{
 					Integer lastSound = potLastSound.get(potId);
 					if (lastSound == null || (repeatTicks > 0 && tick - lastSound >= repeatTicks))
@@ -517,55 +507,12 @@ public class PotAlertPlugin extends Plugin
 						potLastSound.put(potId, tick);
 					}
 					colors.add(resolveColor(type, potId));
-					status = noPot ? "ALERT (none left)" : "ALERT";
 				}
-			}
-
-			if (config.debug())
-			{
-				String pot = potId == null || noPot ? "none" : client.getItemDefinition(potId).getName();
-				debug(type.name(), describe(type) + " | pot: " + pot + " | combat: " + (reallyInCombat ? "yes" : "no") + " | " + status);
 			}
 		}
 
 		potLastSound.keySet().retainAll(alertingPots);
 		activeColors = colors;
-	}
-
-	private final Map<String, String> lastDebug = new HashMap<>();
-
-	private void debug(String key, String message)
-	{
-		if (!config.debug() || message.equals(lastDebug.get(key)))
-		{
-			return;
-		}
-		lastDebug.put(key, message);
-		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "[Pot Alert] " + key + ": " + message, null);
-	}
-
-	private String describe(AlertType type)
-	{
-		switch (type.getKind())
-		{
-			case PRAYER:
-				return "prayer " + client.getBoostedSkillLevel(Skill.PRAYER) + " / alert at " + config.prayerThreshold();
-			case HEART:
-				return "magic " + client.getBoostedSkillLevel(Skill.MAGIC) + " / resip at " + levelText(type)
-					+ " | cooldown " + client.getVarbitValue(VarbitID.IMBUED_HEART_TIMER) * 6 + "s";
-			case TIMED:
-				return "ticks left " + timedRemaining(type, client.getVarpValue(VarPlayerID.POISON));
-			default:
-				Skill skill = lowestSkill(type);
-				return skill.getName() + " " + client.getBoostedSkillLevel(skill) + " (base " + client.getRealSkillLevel(skill)
-					+ ") / resip at " + levelText(type);
-		}
-	}
-
-	private String levelText(AlertType type)
-	{
-		int level = configLevel(type);
-		return level > 0 ? String.valueOf(level) : "auto +" + autoBoost(type);
 	}
 
 	private boolean needsSip(AlertType type, AlertState state, boolean inCombat, int warnTicks)

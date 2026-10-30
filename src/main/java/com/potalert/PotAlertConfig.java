@@ -75,13 +75,6 @@ public interface PotAlertConfig extends Config
 		return 70;
 	}
 
-	@ConfigItem(keyName = "debug", name = "Debug messages",
-		description = "Print what Pot Alert sees for each pot in your chat box whenever it changes", section = generalSection, position = 7)
-	default boolean debug()
-	{
-		return false;
-	}
-
 	@ConfigSection(name = "Edge glow", description = "How the screen edge glow looks", position = 1)
 	String glowSection = "glow";
 
