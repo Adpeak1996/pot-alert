@@ -1,6 +1,6 @@
 # Pot Alert
 
-Your screen edge glows in the color of the potion you need, with a sound, when it's time to sip. Built for AFK slayer, bossing and raids.
+Your screen edge glows in the color of the potion you need, with a sound, when it's time to sip. Great for slayer, bossing and raids, especially when you're not watching your stats closely.
 
 ## How it works
 
