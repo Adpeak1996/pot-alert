@@ -39,42 +39,35 @@ class PotAlertPanel extends PluginPanel
 
 	private static final String INTRO = OPEN
 		+ "<font size='+1' color='#ff981f'><b>Pot Alert</b></font><br>"
-		+ "Your screen edge glows in the color of the pot you need, with a sound, when it's time to sip.<br><br>"
-		+ "<font color='#ff981f'><b>Quick start</b></font><br>"
-		+ "1. Open Pot Alert in the plugin settings<br>"
-		+ "2. Set <i>Resip at level</i> for your boost pots<br>"
-		+ "3. Fight with the pot in your inventory"
+		+ "Your screen glows in the pot's color with a sound when it's time to sip.<br><br>"
+		+ "<font color='#ff981f'><b>How it works</b></font><br>"
+		+ "&bull; One warning, then it goes quiet<br>"
+		+ "&bull; After you drink, it's ready to warn you again<br>"
+		+ "&bull; Only pots in your inventory<br>"
+		+ "&bull; Only boosts you've actually drunk"
 		+ CLOSE;
 
 	private static final String TEST_HELP = OPEN
-		+ "<font color='#ff981f'><b>Test an alert</b></font><br>"
-		+ "Pick a pot and click Test to see its glow and hear its sound. You need to be logged in."
+		+ "<font color='#ff981f'><b>Test</b></font><br>"
+		+ "Pick a pot to see and hear its warning."
 		+ CLOSE;
 
 	private static final String CUSTOM_HELP = OPEN
 		+ "<font color='#ff981f'><b>Custom sounds</b></font><br>"
-		+ "1. Click <i>Add</i> and choose .wav files from your computer<br>"
-		+ "2. Pick one next to any pot<br>"
-		+ "A custom sound replaces that pot's settings sound. Pick <i>Settings sound</i> to switch back. "
-		+ "Only .wav files work. <i>Remove</i> deletes a sound you added."
+		+ "Click <i>Add</i> to pick .wav files, then choose one for any pot."
 		+ CLOSE;
 
 	private static final String REFERENCE = OPEN
-		+ "<font color='#ff981f'><b>When it goes off</b></font><br>"
-		+ "<b>Boost pots:</b> your stat drops to <i>Resip at level</i><br>"
-		+ "<b>Timed pots:</b> a few seconds before they run out (<i>Warn before expiry</i>)<br>"
-		+ "<b>Prayer:</b> at or below <i>Alert at prayer</i><br>"
-		+ "<b>Heart:</b> it's ready and your Magic is low<br><br>"
-		+ "<font color='#ff981f'><b>How it behaves</b></font><br>"
-		+ "&bull; Needs the pot in your inventory. Anti-venom and antifire warn anyway, so you know to tele out<br>"
-		+ "&bull; In combat, it repeats until you sip<br>"
-		+ "&bull; Out of combat, you get a short heads-up, then it goes quiet<br>"
-		+ "&bull; Combat starts when your attack lands, not when you click an NPC or get hit while running past monsters<br>"
-		+ "&bull; After logging in, only prayer can alert until you fight or drink a pot. You can turn the prayer one off too<br><br>"
+		+ "<font color='#ff981f'><b>When it warns</b></font><br>"
+		+ "<b>Boosts:</b> at your <i>Resip at level</i><br>"
+		+ "<b>Timed pots:</b> before they run out<br>"
+		+ "<b>Prayer:</b> at your <i>Alert at prayer</i><br>"
+		+ "<b>Anti-venom, antifire:</b> before they run out, and once more when they do<br><br>"
 		+ "<font color='#ff981f'><b>Tips</b></font><br>"
-		+ "&bull; Set a pot's <i>Sound</i> to Off for glow only<br>"
-		+ "&bull; Wrong glow color? Untick <i>Use potion color</i> in that pot's section and pick your own<br>"
-		+ "&bull; Raid pots count as the normal versions: Elder is super combat, Twisted is bastion, Kodai is battlemage"
+		+ "&bull; Want repeats? Set <i>Remind again every</i>. 0 means one warning only<br>"
+		+ "&bull; Sound <i>Off</i> = glow only<br>"
+		+ "&bull; Quiet at the bank and GE<br>"
+		+ "&bull; Raid pots count as their normal versions"
 		+ CLOSE;
 
 	private final PotAlertPlugin plugin;

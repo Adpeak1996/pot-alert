@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -107,8 +106,6 @@ public class PotAlertPlugin extends Plugin
 	private final Map<Integer, Color> potionColors = new ConcurrentHashMap<>();
 	private final Set<Integer> loadingColors = ConcurrentHashMap.newKeySet();
 
-	private final Map<Integer, Integer> potLastSound = new HashMap<>();
-
 	private int lastCombatTick = -1000;
 	private int nextPoisonTick = -1;
 	private int nextAntifireTick = -1;
@@ -126,15 +123,26 @@ public class PotAlertPlugin extends Plugin
 
 	private static class AlertState
 	{
-		boolean active;
+		boolean armed;
 
-		boolean timerWasActive;
+		int firedTick = -1;
 
-		boolean expired;
+		boolean firedForExpiry;
 
-		int expiredAtLevel;
+		boolean running;
 
-		int idleStartTick = -1;
+		boolean timerSeen;
+
+		boolean expiryPending;
+
+		boolean divineRunning;
+
+		int noArmUntil;
+
+		AlertState(AlertType type)
+		{
+			armed = type.getKind() != AlertType.Kind.BOOST;
+		}
 	}
 
 	PotAlertConfig getConfig()
@@ -208,10 +216,9 @@ public class PotAlertPlugin extends Plugin
 	{
 		for (AlertType type : AlertType.values())
 		{
-			states.put(type, new AlertState());
+			states.put(type, new AlertState(type));
 		}
 		activeColors = Collections.emptyList();
-		potLastSound.clear();
 		nextPoisonTick = -1;
 		nextAntifireTick = -1;
 		nextSuperAntifireTick = -1;
@@ -242,7 +249,7 @@ public class PotAlertPlugin extends Plugin
 				return;
 			}
 			Integer potId = findPots().get(type);
-			if (potId != null && isSharedPot(potId))
+			if (potId != null && (isSharedPot(potId) || type == AlertType.PRAYER))
 			{
 				potId = null;
 			}
@@ -444,84 +451,85 @@ public class PotAlertPlugin extends Plugin
 		}
 
 		int tick = client.getTickCount();
-		int stopTicks = secondsToTicks(config.stopAfter());
 		boolean reallyInCombat = tick - lastCombatTick <= secondsToTicks(config.combatTimeout());
-		boolean inCombat = !config.onlyInCombat() || reallyInCombat;
-		Map<AlertType, Integer> pots = findPots();
+		boolean combatOk = !config.onlyInCombat() || reallyInCombat;
 		int warnTicks = secondsToTicks(config.warnSeconds());
-		int repeatTicks = secondsToTicks(config.repeatSound());
+		int glowTicks = secondsToTicks(config.alertDuration());
+		int remindTicks = secondsToTicks(config.remindEvery());
 		boolean banking = isOpen(InterfaceID.Bankmain.UNIVERSE) || isOpen(InterfaceID.BankDepositbox.UNIVERSE)
 			|| isOpen(InterfaceID.GeOffers.UNIVERSE);
+		Map<AlertType, Integer> pots = findPots();
 
 		List<Color> colors = new ArrayList<>();
-		Set<Integer> alertingPots = new HashSet<>();
+		Set<Integer> soundedPots = new HashSet<>();
+		Set<Integer> glowingPots = new HashSet<>();
 		for (AlertType type : AlertType.values())
 		{
 			AlertState state = states.get(type);
-			Integer potId = pots.get(type);
-			boolean enabled = isEnabled(type);
-
-			boolean needs = enabled && needsSip(type, state, inCombat, warnTicks);
-			boolean noPot = potId == null && warnWithoutPot(type);
-			if (noPot)
+			if (!isEnabled(type))
 			{
-				potId = type.getSampleItemId();
+				state.firedTick = -1;
+				continue;
 			}
-			boolean heldForLogin = waitingForFirstFight
-				&& (type.getKind() != AlertType.Kind.PRAYER || !config.prayerOnLogin())
-				&& !(state.timerWasActive || state.expired);
-			boolean firing = needs && inCombat && potId != null && !heldForLogin;
-			if (potId != null && !noPot)
+
+			boolean needs = needsSip(type, state, warnTicks, tick);
+			boolean expiry = state.expiryPending;
+			if (!needs && !expiry && tick >= state.noArmUntil)
+			{
+				state.armed = true;
+			}
+
+			Integer potId = pots.get(type);
+			if (potId != null)
 			{
 				requestColor(potId);
 			}
+			else if (warnWithoutPot(type))
+			{
+				potId = type.getSampleItemId();
+			}
+			if (potId == null)
+			{
+				state.expiryPending = false;
+				continue;
+			}
 
-			if (firing && !reallyInCombat && state.idleStartTick < 0)
-			{
-				state.idleStartTick = tick;
-			}
-			boolean headsUpOver = firing && !reallyInCombat && stopTicks > 0 && tick - state.idleStartTick >= stopTicks;
+			boolean heldForLogin = waitingForFirstFight && !state.timerSeen
+				&& (type.getKind() != AlertType.Kind.PRAYER || !config.prayerOnLogin());
+			boolean trigger = (state.armed && needs) || expiry;
+			boolean remind = remindTicks > 0 && needs && state.firedTick >= 0 && tick - state.firedTick >= remindTicks;
 
-			if (!firing)
+			if ((trigger || remind) && combatOk && !heldForLogin)
 			{
-				state.active = false;
-				state.idleStartTick = -1;
-			}
-			else if (banking && !reallyInCombat)
-			{
-				state.active = true;
-				state.idleStartTick = tick - stopTicks;
-			}
-			else if (headsUpOver)
-			{
-				state.active = true;
-			}
-			else
-			{
-				if (reallyInCombat)
+				state.armed = false;
+				state.expiryPending = false;
+				if (banking)
 				{
-					state.idleStartTick = -1;
+					state.firedTick = tick - glowTicks;
 				}
-				state.active = true;
-
-				if (alertingPots.add(potId))
+				else
 				{
-					Integer lastSound = potLastSound.get(potId);
-					if (lastSound == null || (repeatTicks > 0 && tick - lastSound >= repeatTicks))
+					state.firedTick = tick;
+					state.firedForExpiry = expiry && !needs;
+					if (soundedPots.add(potId))
 					{
 						playSound(type);
-						potLastSound.put(potId, tick);
 					}
-					colors.add(resolveColor(type, potId));
 				}
 			}
-		}
 
-		potLastSound.keySet().retainAll(alertingPots);
+			boolean glowing = state.firedTick >= 0 && tick - state.firedTick < glowTicks
+				&& (needs || state.firedForExpiry);
+			if (glowing && glowingPots.add(potId))
+			{
+				int colorId = type == AlertType.PRAYER ? type.getSampleItemId() : potId;
+				colors.add(resolveColor(type, colorId));
+			}
+		}
 		activeColors = colors;
 	}
 
-	private boolean needsSip(AlertType type, AlertState state, boolean inCombat, int warnTicks)
+	private boolean needsSip(AlertType type, AlertState state, int warnTicks, int tick)
 	{
 		switch (type.getKind())
 		{
@@ -529,7 +537,6 @@ public class PotAlertPlugin extends Plugin
 				return client.getBoostedSkillLevel(Skill.PRAYER) <= config.prayerThreshold();
 
 			case HEART:
-
 				return client.getVarbitValue(VarbitID.IMBUED_HEART_TIMER) == 0 && statIsLow(type);
 
 			case TIMED:
@@ -538,22 +545,41 @@ public class PotAlertPlugin extends Plugin
 				if (type == AlertType.POISON && poison > 0)
 				{
 					venomPhase = false;
+					state.running = false;
+					state.expiryPending = false;
 					return config.poisonWhenPoisoned();
 				}
-				return timedCheck(state, timedRemaining(type, poison), inCombat, warnTicks, -1);
+
+				int remaining = timedRemaining(type, poison);
+				boolean running = remaining > 0;
+				if (state.running && !running && (type == AlertType.POISON || type == AlertType.ANTIFIRE))
+				{
+					state.expiryPending = true;
+				}
+				if (running)
+				{
+					state.expiryPending = false;
+					state.timerSeen = true;
+				}
+				state.running = running;
+				return running && remaining <= warnTicks;
 			}
 
 			default:
 			{
-				boolean low = statIsLow(type);
 				int divineLeft = 0;
 				for (int varbit : type.getDivineVarbits())
 				{
 					divineLeft = Math.max(divineLeft, client.getVarbitValue(varbit));
 				}
-				int boosted = client.getBoostedSkillLevel(lowestSkill(type));
-				boolean divine = timedCheck(state, divineLeft > 0 ? divineLeft : -1, inCombat, warnTicks, boosted);
-				return low || divine;
+				if (state.divineRunning && divineLeft == 0)
+				{
+					state.armed = false;
+					state.noArmUntil = tick + 5;
+				}
+				state.divineRunning = divineLeft > 0;
+				boolean divineEnding = divineLeft > 0 && divineLeft <= warnTicks;
+				return statIsLow(type) || divineEnding;
 			}
 		}
 	}
@@ -620,32 +646,6 @@ public class PotAlertPlugin extends Plugin
 			default:
 				return -1;
 		}
-	}
-
-	private boolean timedCheck(AlertState state, int remaining, boolean inCombat, int warnTicks, int level)
-	{
-		if (remaining > 0)
-		{
-			state.timerWasActive = true;
-			state.expired = false;
-			return remaining <= warnTicks;
-		}
-
-		if (state.timerWasActive)
-		{
-			state.timerWasActive = false;
-			if (inCombat && config.keepAlertingAfterExpiry())
-			{
-				state.expired = true;
-				state.expiredAtLevel = level;
-			}
-		}
-
-		if (state.expired && (!inCombat || (level >= 0 && level > state.expiredAtLevel)))
-		{
-			state.expired = false;
-		}
-		return state.expired;
 	}
 
 	private int poisonRemaining(int value)

@@ -1,30 +1,30 @@
 # Pot Alert
 
-Pot Alert glows the edge of your screen in the color of the potion you need, and plays a sound, when it's time to sip. It's built for AFK slayer and bossing, where it's easy to forget to repot.
+Your screen edge glows in the color of the potion you need, with a sound, when it's time to sip. Built for AFK slayer, bossing and raids.
+
+## How it works
+
+- **One warning, then quiet.** The glow fades after a few seconds, or as soon as you sip.
+- **Resets when you drink.** Once your stat, timer or prayer goes back up, it's ready to warn you again next time it runs low.
+- **Only pots in your inventory**, and only boosts you've actually drunk, so a pot you're saving for later stays quiet.
+- **Quiet at the bank and Grand Exchange**, and when monsters hit you while you're running past.
 
 ## What it watches
 
-| Type | Pots | Alerts when |
+| Type | Pots | Warns |
 |---|---|---|
-| Boosts | Attack, Strength, Defence, Super combat, Ranging, Bastion, Magic, Battlemage (regular, super, divine, mixes, and CoX versions) | Your stat drops to your **Resip at level** |
-| Timed pots | Divines, Overload, Smelling salts, Anti-venom / antipoison, Antifire, Prayer regeneration, Prayer enhance, Liquid adrenaline, Menaphite remedy, Stamina | A set number of seconds before they run out |
-| Heart | Imbued and saturated heart | It's off cooldown and your Magic is low |
-| Prayer | Prayer pots, super restores, sanfew, revitalisation | Your prayer drops to **Alert at prayer** |
+| Boosts | Attack, Strength, Defence, Super combat, Ranging, Bastion, Magic, Battlemage, including divine, mixes and raid versions | At your **Resip at level** |
+| Timed | Divines, Overload, Smelling salts, Anti-venom, Antifire, Prayer regeneration, Prayer enhance, Liquid adrenaline, Menaphite remedy, Stamina | Before they run out |
+| Heart | Imbued and saturated heart | When it's ready and your Magic is low |
+| Prayer | Prayer pots, super restores, sanfew, revitalisation | At your **Alert at prayer** |
 
-## How it behaves
+Anti-venom and antifire also warn once when they run out, even if you have none left, so you know to teleport.
 
-- Only alerts if the matching pot is in your inventory. Anti-venom and antifire can warn even when you have none left, so you know to teleport out.
-- In combat, it repeats until you sip. Out of combat, you get a short heads-up and then it goes quiet.
-- Combat starts when your attack lands, not when you click an NPC or get hit running past monsters.
-- Quiet while the bank, deposit box or Grand Exchange is open.
-- After logging in, only prayer can alert until you fight or drink something. The prayer one can be turned off too.
+## Options
 
-## Glow and sound
+- Each pot has its own sound, or Off for glow only
+- Add your own `.wav` sounds from the Pot Alert sidebar tab
+- Set **Remind again every** if you want repeat warnings (0 means one warning only)
+- Use the pot's real color, or pick your own
 
-- The glow uses the actual color of the pot in your inventory. Dark pots like anti-venom are brightened so they still show up, and any pot can use a color you pick instead.
-- Every pot has its own sound, chosen from the game's own sound effects, or Off for glow only.
-- You can add your own `.wav` files from the Pot Alert sidebar tab and pick one for any pot.
-
-## Sidebar tab
-
-The Pot Alert tab has a quick guide, a **Test** button to preview any pot's glow and sound, the custom sound picker, and a reset button.
+The sidebar tab also has a **Test** button to preview any pot's warning.

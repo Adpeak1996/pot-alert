@@ -17,14 +17,14 @@ public interface PotAlertConfig extends Config
 	String generalSection = "general";
 
 	@ConfigItem(keyName = "onlyInCombat", name = "Only in combat",
-		description = "Only alert while fighting. When off, you still get a short heads-up out of combat (see below)", section = generalSection, position = 0)
+		description = "Only warn while you're fighting", section = generalSection, position = 0)
 	default boolean onlyInCombat()
 	{
 		return false;
 	}
 
 	@ConfigItem(keyName = "hitsCountAsCombat", name = "Getting hit counts as combat",
-		description = "When off, only your own attacks count as combat, so running past aggressive monsters won't set off alerts", section = generalSection, position = 1)
+		description = "When off, only your own attacks count, so running past monsters won't set off warnings", section = generalSection, position = 1)
 	default boolean hitsCountAsCombat()
 	{
 		return false;
@@ -33,7 +33,7 @@ public interface PotAlertConfig extends Config
 	@Range(min = 1, max = 60)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "combatTimeout", name = "Combat timeout",
-		description = "How long after your last attack lands you still count as in combat", section = generalSection, position = 1)
+		description = "How long after your last attack you still count as in combat", section = generalSection, position = 2)
 	default int combatTimeout()
 	{
 		return 10;
@@ -42,35 +42,28 @@ public interface PotAlertConfig extends Config
 	@Range(min = 0, max = 120)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "warnSeconds", name = "Warn before expiry",
-		description = "Seconds of warning before a timed pot runs out (divines, overload, salts, anti-venom, antifire, prayer regen/enhance, adrenaline, remedy, stamina)", section = generalSection, position = 2)
+		description = "How many seconds before a timed pot runs out to warn you", section = generalSection, position = 3)
 	default int warnSeconds()
 	{
 		return 20;
 	}
 
-	@ConfigItem(keyName = "keepAlertingAfterExpiry", name = "Keep alerting after expiry",
-		description = "If a timed pot runs out mid-fight and you didn't resip, keep alerting until you do", section = generalSection, position = 3)
-	default boolean keepAlertingAfterExpiry()
+	@Range(min = 1, max = 60)
+	@Units(Units.SECONDS)
+	@ConfigItem(keyName = "alertDuration", name = "Warning glow",
+		description = "How long the screen glows for each warning. It stops early once you sip", section = generalSection, position = 4)
+	default int alertDuration()
 	{
-		return true;
+		return 8;
 	}
 
-	@Range(min = 0, max = 120)
+	@Range(min = 0, max = 300)
 	@Units(Units.SECONDS)
-	@ConfigItem(keyName = "repeatSound", name = "Repeat sound every",
-		description = "Replay the sound while the alert is still up. 0 plays it once", section = generalSection, position = 4)
-	default int repeatSound()
+	@ConfigItem(keyName = "remindEvery", name = "Remind again every",
+		description = "How often to repeat the warning until you drink. Leave at 0 for just one warning", section = generalSection, position = 5)
+	default int remindEvery()
 	{
-		return 30;
-	}
-
-	@Range(min = 0, max = 600)
-	@Units(Units.SECONDS)
-	@ConfigItem(keyName = "stopAfter", name = "Out of combat heads-up",
-		description = "Out of combat, an alert glows and plays for this long, then stays quiet until you're back in combat or you sip. 0 keeps going", section = generalSection, position = 5)
-	default int stopAfter()
-	{
-		return 10;
+		return 0;
 	}
 
 	@Range(min = 0, max = 100)
@@ -849,7 +842,7 @@ public interface PotAlertConfig extends Config
 	}
 
 	@ConfigItem(keyName = "prayerUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = prayerSection, position = 2)
+		description = "Glow prayer potion teal for every prayer and restore pot. Turn off to use the color below", section = prayerSection, position = 2)
 	default boolean prayerUsePotionColor()
 	{
 		return true;
