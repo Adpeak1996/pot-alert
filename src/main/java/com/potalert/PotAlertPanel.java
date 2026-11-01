@@ -59,14 +59,16 @@ class PotAlertPanel extends PluginPanel
 
 	private static final String REFERENCE = OPEN
 		+ "<font color='#ff981f'><b>When it warns</b></font><br>"
-		+ "<b>Boosts:</b> at your <i>Resip at level</i><br>"
+		+ "<b>Boosts and skilling pots:</b> at your <i>Resip at level</i><br>"
 		+ "<b>Timed pots:</b> before they run out<br>"
 		+ "<b>Prayer:</b> at your <i>Alert at prayer</i><br>"
 		+ "<b>Anti-venom, antifire:</b> before they run out, and once more when they do<br><br>"
 		+ "<font color='#ff981f'><b>Tips</b></font><br>"
 		+ "&bull; Want repeats? Set <i>Remind again every</i>. 0 means one warning only<br>"
 		+ "&bull; Sound <i>Off</i> = glow only<br>"
+		+ "&bull; <i>Brighten dark potions</i> (on by default) lightens dark colors like anti-venom so the glow is easy to see<br>"
 		+ "&bull; Quiet at the bank and GE<br>"
+		+ "&bull; Fishing, Hunter and Agility pots warn even with <i>Only in combat</i> on<br>"
 		+ "&bull; Raid pots count as their normal versions"
 		+ CLOSE;
 

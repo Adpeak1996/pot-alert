@@ -41,6 +41,10 @@ public enum AlertType
 		ItemID._4DOSEBATTLEMAGE, new int[]{VarbitID.DIVINEBATTLEMAGE_POTION_TIME},
 		"battlemage potion", "kodai (", "kodai potion"),
 
+	ZAMORAK("zamorak", "Zamorak brew", Kind.BOOST, new Skill[]{Skill.ATTACK, Skill.STRENGTH}, new Color(0xB8862E), AlertSound.DRINK,
+		ItemID._4DOSEPOTIONOFZAMORAK, new int[0],
+		"zamorak brew", "zamorak mix"),
+
 	HEART("heart", "Heart", Kind.HEART, new Skill[]{Skill.MAGIC}, new Color(0xC23A6B), AlertSound.DRINK,
 		ItemID.IMBUED_HEART, new int[0],
 		"imbued heart", "saturated heart"),
@@ -81,13 +85,29 @@ public enum AlertType
 		ItemID._4DOSESTAMINA, new int[0],
 		"stamina"),
 
+	GOADING("goading", "Goading", Kind.TIMED, new Skill[0], new Color(0xC0392B), AlertSound.DRINK,
+		ItemID._4DOSEGOADING, new int[0],
+		"goading"),
+
+	FISHING("fishing", "Fishing", Kind.SKILL, new Skill[]{Skill.FISHING}, new Color(0x3A7BD5), AlertSound.DRINK,
+		ItemID._4DOSEFISHERSPOTION, new int[0],
+		"fishing potion", "fishing mix"),
+
+	HUNTER("hunter", "Hunter", Kind.SKILL, new Skill[]{Skill.HUNTER}, new Color(0x7A9A3A), AlertSound.DRINK,
+		ItemID._4DOSEHUNTING, new int[0],
+		"hunter potion"),
+
+	AGILITY("agility", "Agility", Kind.SKILL, new Skill[]{Skill.AGILITY}, new Color(0x3AB8A0), AlertSound.DRINK,
+		ItemID._4DOSE1AGILITY, new int[0],
+		"agility potion", "agility mix"),
+
 	PRAYER("prayer", "Prayer", Kind.PRAYER, new Skill[]{Skill.PRAYER}, new Color(0x2FC4A8), AlertSound.PRAYER_DRAINED,
 		ItemID._4DOSEPRAYERRESTORE, new int[0],
-		"prayer potion", "prayer mix", "super restore", "sanfew", "revitalisation (", "revitalisation potion");
+		"prayer potion", "prayer mix", "super restore", "sanfew", "revitalisation (", "revitalisation potion", "tears of elidinis", "blessed crystal scarab", "egniol");
 
 	enum Kind
 	{
-		BOOST, HEART, TIMED, PRAYER
+		BOOST, SKILL, HEART, TIMED, PRAYER
 	}
 
 	private final String key;

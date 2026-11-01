@@ -17,7 +17,7 @@ public interface PotAlertConfig extends Config
 	String generalSection = "general";
 
 	@ConfigItem(keyName = "onlyInCombat", name = "Only in combat",
-		description = "Only warn while you're fighting", section = generalSection, position = 0)
+		description = "Only warn while you're fighting. Fishing, Hunter and Agility pots still warn", section = generalSection, position = 0)
 	default boolean onlyInCombat()
 	{
 		return false;
@@ -448,7 +448,49 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Imbued / saturated heart", description = "Alerts when your heart is off cooldown and your Magic is low", position = 10, closedByDefault = true)
+	@ConfigSection(name = "Zamorak brew", description = "Zamorak brews and mixes", position = 10, closedByDefault = true)
+	String zamorakSection = "zamorak";
+
+	@ConfigItem(keyName = "zamorakEnabled", name = "Enabled", description = "", section = zamorakSection, position = 0)
+	default boolean zamorakEnabled()
+	{
+		return true;
+	}
+
+	@Range(min = 0, max = 150)
+	@ConfigItem(keyName = "zamorakLevel", name = "Resip at level",
+		description = "Alert when your Attack or Strength drops to this level. Set to 0 for automatic (a few levels above your base)", section = zamorakSection, position = 1)
+	default int zamorakLevel()
+	{
+		return 0;
+	}
+
+	@ConfigItem(keyName = "zamorakUsePotionColor", name = "Use potion color",
+		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = zamorakSection, position = 2)
+	default boolean zamorakUsePotionColor()
+	{
+		return true;
+	}
+
+	@ConfigItem(keyName = "zamorakColor", name = "Color", description = "Used when 'Use potion color' is off", section = zamorakSection, position = 3)
+	default Color zamorakColor()
+	{
+		return AlertType.ZAMORAK.getDefaultColor();
+	}
+
+	@ConfigItem(keyName = "zamorakSound", name = "Sound", description = "Off for glow only. A custom sound picked in the Pot Alert sidebar overrides this", section = zamorakSection, position = 4)
+	default AlertSound zamorakSound()
+	{
+		return AlertType.ZAMORAK.getDefaultSound();
+	}
+
+	@ConfigItem(keyName = "zamorakCustomFile", name = "Custom file", description = "", section = zamorakSection, position = 5, hidden = true)
+	default String zamorakCustomFile()
+	{
+		return "";
+	}
+
+	@ConfigSection(name = "Imbued / saturated heart", description = "Alerts when your heart is off cooldown and your Magic is low", position = 11, closedByDefault = true)
 	String heartSection = "heart";
 
 	@ConfigItem(keyName = "heartEnabled", name = "Enabled", description = "", section = heartSection, position = 0)
@@ -490,7 +532,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Overload", description = "NMZ, raids and blighted overloads", position = 11, closedByDefault = true)
+	@ConfigSection(name = "Overload", description = "NMZ, raids and blighted overloads", position = 12, closedByDefault = true)
 	String overloadSection = "overload";
 
 	@ConfigItem(keyName = "overloadEnabled", name = "Enabled", description = "", section = overloadSection, position = 0)
@@ -524,7 +566,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Smelling salts", description = "Tombs of Amascut smelling salts", position = 12, closedByDefault = true)
+	@ConfigSection(name = "Smelling salts", description = "Tombs of Amascut smelling salts", position = 13, closedByDefault = true)
 	String saltsSection = "salts";
 
 	@ConfigItem(keyName = "saltsEnabled", name = "Enabled", description = "", section = saltsSection, position = 0)
@@ -558,7 +600,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Anti-poison / venom", description = "Antipoison, antidote, anti-venom, sanfew", position = 13, closedByDefault = true)
+	@ConfigSection(name = "Anti-poison / venom", description = "Antipoison, antidote, anti-venom, sanfew", position = 14, closedByDefault = true)
 	String poisonSection = "poison";
 
 	@ConfigItem(keyName = "poisonEnabled", name = "Enabled", description = "", section = poisonSection, position = 0)
@@ -606,7 +648,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Antifire", description = "Antifire, super antifire, extended versions", position = 14, closedByDefault = true)
+	@ConfigSection(name = "Antifire", description = "Antifire, super antifire, extended versions", position = 15, closedByDefault = true)
 	String antifireSection = "antifire";
 
 	@ConfigItem(keyName = "antifireEnabled", name = "Enabled", description = "", section = antifireSection, position = 0)
@@ -647,7 +689,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Prayer regeneration", description = "Prayer regeneration potions", position = 15, closedByDefault = true)
+	@ConfigSection(name = "Prayer regeneration", description = "Prayer regeneration potions", position = 16, closedByDefault = true)
 	String prayerregenSection = "prayerregen";
 
 	@ConfigItem(keyName = "prayerregenEnabled", name = "Enabled", description = "", section = prayerregenSection, position = 0)
@@ -681,7 +723,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Prayer enhance", description = "Chambers of Xeric prayer enhance", position = 16, closedByDefault = true)
+	@ConfigSection(name = "Prayer enhance", description = "Chambers of Xeric prayer enhance", position = 17, closedByDefault = true)
 	String enhanceSection = "enhance";
 
 	@ConfigItem(keyName = "enhanceEnabled", name = "Enabled", description = "", section = enhanceSection, position = 0)
@@ -715,7 +757,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Liquid adrenaline", description = "Tombs of Amascut liquid adrenaline", position = 17, closedByDefault = true)
+	@ConfigSection(name = "Liquid adrenaline", description = "Tombs of Amascut liquid adrenaline", position = 18, closedByDefault = true)
 	String adrenalineSection = "adrenaline";
 
 	@ConfigItem(keyName = "adrenalineEnabled", name = "Enabled", description = "", section = adrenalineSection, position = 0)
@@ -749,7 +791,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Menaphite remedy", description = "Menaphite remedy", position = 18, closedByDefault = true)
+	@ConfigSection(name = "Menaphite remedy", description = "Menaphite remedy", position = 19, closedByDefault = true)
 	String remedySection = "remedy";
 
 	@ConfigItem(keyName = "remedyEnabled", name = "Enabled", description = "", section = remedySection, position = 0)
@@ -783,7 +825,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Stamina", description = "Stamina potions and mixes", position = 19, closedByDefault = true)
+	@ConfigSection(name = "Stamina", description = "Stamina potions and mixes", position = 20, closedByDefault = true)
 	String staminaSection = "stamina";
 
 	@ConfigItem(keyName = "staminaEnabled", name = "Enabled", description = "", section = staminaSection, position = 0)
@@ -817,7 +859,167 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Prayer", description = "Prayer pots, super restores, sanfew, CoX revitalisation", position = 20, closedByDefault = true)
+	@ConfigSection(name = "Goading", description = "Goading potions", position = 21, closedByDefault = true)
+	String goadingSection = "goading";
+
+	@ConfigItem(keyName = "goadingEnabled", name = "Enabled", description = "", section = goadingSection, position = 0)
+	default boolean goadingEnabled()
+	{
+		return true;
+	}
+
+	@ConfigItem(keyName = "goadingUsePotionColor", name = "Use potion color",
+		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = goadingSection, position = 2)
+	default boolean goadingUsePotionColor()
+	{
+		return true;
+	}
+
+	@ConfigItem(keyName = "goadingColor", name = "Color", description = "Used when 'Use potion color' is off", section = goadingSection, position = 3)
+	default Color goadingColor()
+	{
+		return AlertType.GOADING.getDefaultColor();
+	}
+
+	@ConfigItem(keyName = "goadingSound", name = "Sound", description = "Off for glow only. A custom sound picked in the Pot Alert sidebar overrides this", section = goadingSection, position = 4)
+	default AlertSound goadingSound()
+	{
+		return AlertType.GOADING.getDefaultSound();
+	}
+
+	@ConfigItem(keyName = "goadingCustomFile", name = "Custom file", description = "", section = goadingSection, position = 5, hidden = true)
+	default String goadingCustomFile()
+	{
+		return "";
+	}
+
+	@ConfigSection(name = "Fishing", description = "Fishing and super fishing potions. Warns even with Only in combat on", position = 22, closedByDefault = true)
+	String fishingSection = "fishing";
+
+	@ConfigItem(keyName = "fishingEnabled", name = "Enabled", description = "", section = fishingSection, position = 0)
+	default boolean fishingEnabled()
+	{
+		return true;
+	}
+
+	@Range(min = 0, max = 150)
+	@ConfigItem(keyName = "fishingLevel", name = "Resip at level",
+		description = "Alert when your Fishing drops to this level. Set to 0 for automatic (a few levels above your base)", section = fishingSection, position = 1)
+	default int fishingLevel()
+	{
+		return 0;
+	}
+
+	@ConfigItem(keyName = "fishingUsePotionColor", name = "Use potion color",
+		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = fishingSection, position = 2)
+	default boolean fishingUsePotionColor()
+	{
+		return true;
+	}
+
+	@ConfigItem(keyName = "fishingColor", name = "Color", description = "Used when 'Use potion color' is off", section = fishingSection, position = 3)
+	default Color fishingColor()
+	{
+		return AlertType.FISHING.getDefaultColor();
+	}
+
+	@ConfigItem(keyName = "fishingSound", name = "Sound", description = "Off for glow only. A custom sound picked in the Pot Alert sidebar overrides this", section = fishingSection, position = 4)
+	default AlertSound fishingSound()
+	{
+		return AlertType.FISHING.getDefaultSound();
+	}
+
+	@ConfigItem(keyName = "fishingCustomFile", name = "Custom file", description = "", section = fishingSection, position = 5, hidden = true)
+	default String fishingCustomFile()
+	{
+		return "";
+	}
+
+	@ConfigSection(name = "Hunter", description = "Hunter and super hunter potions. Warns even with Only in combat on", position = 23, closedByDefault = true)
+	String hunterSection = "hunter";
+
+	@ConfigItem(keyName = "hunterEnabled", name = "Enabled", description = "", section = hunterSection, position = 0)
+	default boolean hunterEnabled()
+	{
+		return true;
+	}
+
+	@Range(min = 0, max = 150)
+	@ConfigItem(keyName = "hunterLevel", name = "Resip at level",
+		description = "Alert when your Hunter drops to this level. Set to 0 for automatic (a few levels above your base)", section = hunterSection, position = 1)
+	default int hunterLevel()
+	{
+		return 0;
+	}
+
+	@ConfigItem(keyName = "hunterUsePotionColor", name = "Use potion color",
+		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = hunterSection, position = 2)
+	default boolean hunterUsePotionColor()
+	{
+		return true;
+	}
+
+	@ConfigItem(keyName = "hunterColor", name = "Color", description = "Used when 'Use potion color' is off", section = hunterSection, position = 3)
+	default Color hunterColor()
+	{
+		return AlertType.HUNTER.getDefaultColor();
+	}
+
+	@ConfigItem(keyName = "hunterSound", name = "Sound", description = "Off for glow only. A custom sound picked in the Pot Alert sidebar overrides this", section = hunterSection, position = 4)
+	default AlertSound hunterSound()
+	{
+		return AlertType.HUNTER.getDefaultSound();
+	}
+
+	@ConfigItem(keyName = "hunterCustomFile", name = "Custom file", description = "", section = hunterSection, position = 5, hidden = true)
+	default String hunterCustomFile()
+	{
+		return "";
+	}
+
+	@ConfigSection(name = "Agility", description = "Agility potions and mixes. Warns even with Only in combat on", position = 24, closedByDefault = true)
+	String agilitySection = "agility";
+
+	@ConfigItem(keyName = "agilityEnabled", name = "Enabled", description = "", section = agilitySection, position = 0)
+	default boolean agilityEnabled()
+	{
+		return true;
+	}
+
+	@Range(min = 0, max = 150)
+	@ConfigItem(keyName = "agilityLevel", name = "Resip at level",
+		description = "Alert when your Agility drops to this level. Set to 0 for automatic (a few levels above your base)", section = agilitySection, position = 1)
+	default int agilityLevel()
+	{
+		return 0;
+	}
+
+	@ConfigItem(keyName = "agilityUsePotionColor", name = "Use potion color",
+		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = agilitySection, position = 2)
+	default boolean agilityUsePotionColor()
+	{
+		return true;
+	}
+
+	@ConfigItem(keyName = "agilityColor", name = "Color", description = "Used when 'Use potion color' is off", section = agilitySection, position = 3)
+	default Color agilityColor()
+	{
+		return AlertType.AGILITY.getDefaultColor();
+	}
+
+	@ConfigItem(keyName = "agilitySound", name = "Sound", description = "Off for glow only. A custom sound picked in the Pot Alert sidebar overrides this", section = agilitySection, position = 4)
+	default AlertSound agilitySound()
+	{
+		return AlertType.AGILITY.getDefaultSound();
+	}
+
+	@ConfigItem(keyName = "agilityCustomFile", name = "Custom file", description = "", section = agilitySection, position = 5, hidden = true)
+	default String agilityCustomFile()
+	{
+		return "";
+	}
+
+	@ConfigSection(name = "Prayer", description = "Prayer pots, super restores, sanfew, CoX revitalisation, ToA tears of Elidinis and scarabs", position = 25, closedByDefault = true)
 	String prayerSection = "prayer";
 
 	@ConfigItem(keyName = "prayerEnabled", name = "Enabled", description = "", section = prayerSection, position = 0)

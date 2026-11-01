@@ -56,7 +56,7 @@ import net.runelite.client.util.Text;
 	internalName = "pot-alert",
 	legacyDataDirectory = "pot-alert",
 	description = "Color-coded edge glow and sound before your potions or prayer run out",
-	tags = {"potion", "reminder", "divine", "antivenom", "antipoison", "antifire", "overload", "smelling salts", "stamina", "heart", "prayer", "boost", "afk", "slayer"}
+	tags = {"potion", "reminder", "divine", "antivenom", "antipoison", "antifire", "overload", "smelling salts", "stamina", "heart", "prayer", "boost", "goading", "fishing", "hunter", "agility", "zamorak brew", "slayer"}
 )
 public class PotAlertPlugin extends Plugin
 {
@@ -141,7 +141,7 @@ public class PotAlertPlugin extends Plugin
 
 		AlertState(AlertType type)
 		{
-			armed = type.getKind() != AlertType.Kind.BOOST;
+			armed = type.getKind() != AlertType.Kind.BOOST && type.getKind() != AlertType.Kind.SKILL;
 		}
 	}
 
@@ -499,7 +499,7 @@ public class PotAlertPlugin extends Plugin
 			boolean trigger = (state.armed && needs) || expiry;
 			boolean remind = remindTicks > 0 && needs && state.firedTick >= 0 && tick - state.firedTick >= remindTicks;
 
-			if ((trigger || remind) && combatOk && !heldForLogin)
+			if ((trigger || remind) && (combatOk || type.getKind() == AlertType.Kind.SKILL) && !heldForLogin)
 			{
 				state.armed = false;
 				state.expiryPending = false;
@@ -640,6 +640,11 @@ public class PotAlertPlugin extends Plugin
 				return endTickRemaining(enhanceEndTick);
 			case ADRENALINE:
 				return endTickRemaining(adrenalineEndTick);
+			case GOADING:
+			{
+				int goading = client.getVarbitValue(VarbitID.GOADING_POTION_TIMER);
+				return goading > 0 ? goading * 6 : -1;
+			}
 			case STAMINA:
 				return client.getVarbitValue(VarbitID.STAMINA_ACTIVE) == 1
 					? Math.max(1, client.getVarbitValue(VarbitID.STAMINA_DURATION) * 10) : -1;
@@ -760,6 +765,9 @@ public class PotAlertPlugin extends Plugin
 			case MAGIC:
 			case BATTLEMAGE: return 2;
 			case HEART: return 3;
+			case FISHING:
+			case HUNTER:
+			case AGILITY: return 1;
 			default: return 5;
 		}
 	}
@@ -776,6 +784,7 @@ public class PotAlertPlugin extends Plugin
 			case BASTION: return config.bastionEnabled();
 			case MAGIC: return config.magicEnabled();
 			case BATTLEMAGE: return config.battlemageEnabled();
+			case ZAMORAK: return config.zamorakEnabled();
 			case HEART: return config.heartEnabled();
 			case OVERLOAD: return config.overloadEnabled();
 			case SALTS: return config.saltsEnabled();
@@ -786,6 +795,10 @@ public class PotAlertPlugin extends Plugin
 			case ADRENALINE: return config.adrenalineEnabled();
 			case REMEDY: return config.remedyEnabled();
 			case STAMINA: return config.staminaEnabled();
+			case GOADING: return config.goadingEnabled();
+			case FISHING: return config.fishingEnabled();
+			case HUNTER: return config.hunterEnabled();
+			case AGILITY: return config.agilityEnabled();
 			case PRAYER: return config.prayerEnabled();
 			default: return false;
 		}
@@ -803,7 +816,11 @@ public class PotAlertPlugin extends Plugin
 			case BASTION: return config.bastionLevel();
 			case MAGIC: return config.magicLevel();
 			case BATTLEMAGE: return config.battlemageLevel();
+			case ZAMORAK: return config.zamorakLevel();
 			case HEART: return config.heartLevel();
+			case FISHING: return config.fishingLevel();
+			case HUNTER: return config.hunterLevel();
+			case AGILITY: return config.agilityLevel();
 			default: return 0;
 		}
 	}
@@ -820,6 +837,7 @@ public class PotAlertPlugin extends Plugin
 			case BASTION: return config.bastionUsePotionColor();
 			case MAGIC: return config.magicUsePotionColor();
 			case BATTLEMAGE: return config.battlemageUsePotionColor();
+			case ZAMORAK: return config.zamorakUsePotionColor();
 			case HEART: return config.heartUsePotionColor();
 			case OVERLOAD: return config.overloadUsePotionColor();
 			case SALTS: return config.saltsUsePotionColor();
@@ -830,6 +848,10 @@ public class PotAlertPlugin extends Plugin
 			case ADRENALINE: return config.adrenalineUsePotionColor();
 			case REMEDY: return config.remedyUsePotionColor();
 			case STAMINA: return config.staminaUsePotionColor();
+			case GOADING: return config.goadingUsePotionColor();
+			case FISHING: return config.fishingUsePotionColor();
+			case HUNTER: return config.hunterUsePotionColor();
+			case AGILITY: return config.agilityUsePotionColor();
 			case PRAYER: return config.prayerUsePotionColor();
 			default: return true;
 		}
@@ -847,6 +869,7 @@ public class PotAlertPlugin extends Plugin
 			case BASTION: return config.bastionColor();
 			case MAGIC: return config.magicColor();
 			case BATTLEMAGE: return config.battlemageColor();
+			case ZAMORAK: return config.zamorakColor();
 			case HEART: return config.heartColor();
 			case OVERLOAD: return config.overloadColor();
 			case SALTS: return config.saltsColor();
@@ -857,6 +880,10 @@ public class PotAlertPlugin extends Plugin
 			case ADRENALINE: return config.adrenalineColor();
 			case REMEDY: return config.remedyColor();
 			case STAMINA: return config.staminaColor();
+			case GOADING: return config.goadingColor();
+			case FISHING: return config.fishingColor();
+			case HUNTER: return config.hunterColor();
+			case AGILITY: return config.agilityColor();
 			case PRAYER: return config.prayerColor();
 			default: return type.getDefaultColor();
 		}
@@ -874,6 +901,7 @@ public class PotAlertPlugin extends Plugin
 			case BASTION: return config.bastionSound();
 			case MAGIC: return config.magicSound();
 			case BATTLEMAGE: return config.battlemageSound();
+			case ZAMORAK: return config.zamorakSound();
 			case HEART: return config.heartSound();
 			case OVERLOAD: return config.overloadSound();
 			case SALTS: return config.saltsSound();
@@ -884,6 +912,10 @@ public class PotAlertPlugin extends Plugin
 			case ADRENALINE: return config.adrenalineSound();
 			case REMEDY: return config.remedySound();
 			case STAMINA: return config.staminaSound();
+			case GOADING: return config.goadingSound();
+			case FISHING: return config.fishingSound();
+			case HUNTER: return config.hunterSound();
+			case AGILITY: return config.agilitySound();
 			case PRAYER: return config.prayerSound();
 			default: return AlertSound.OFF;
 		}
@@ -901,6 +933,7 @@ public class PotAlertPlugin extends Plugin
 			case BASTION: return config.bastionCustomFile();
 			case MAGIC: return config.magicCustomFile();
 			case BATTLEMAGE: return config.battlemageCustomFile();
+			case ZAMORAK: return config.zamorakCustomFile();
 			case HEART: return config.heartCustomFile();
 			case OVERLOAD: return config.overloadCustomFile();
 			case SALTS: return config.saltsCustomFile();
@@ -911,6 +944,10 @@ public class PotAlertPlugin extends Plugin
 			case ADRENALINE: return config.adrenalineCustomFile();
 			case REMEDY: return config.remedyCustomFile();
 			case STAMINA: return config.staminaCustomFile();
+			case GOADING: return config.goadingCustomFile();
+			case FISHING: return config.fishingCustomFile();
+			case HUNTER: return config.hunterCustomFile();
+			case AGILITY: return config.agilityCustomFile();
 			case PRAYER: return config.prayerCustomFile();
 			default: return "";
 		}

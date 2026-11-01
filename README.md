@@ -13,10 +13,11 @@ Your screen edge glows in the color of the potion you need, with a sound, when i
 
 | Type | Pots | Warns |
 |---|---|---|
-| Boosts | Attack, Strength, Defence, Super combat, Ranging, Bastion, Magic, Battlemage, including divine, mixes and raid versions | At your **Resip at level** |
-| Timed | Divines, Overload, Smelling salts, Anti-venom, Antifire, Prayer regeneration, Prayer enhance, Liquid adrenaline, Menaphite remedy, Stamina | Before they run out |
+| Boosts | Attack, Strength, Defence, Super combat, Ranging, Bastion, Magic, Battlemage, Zamorak brew, including divine, mixes and raid versions | At your **Resip at level** |
+| Skilling | Fishing, Hunter, Agility, including super versions | At your **Resip at level** |
+| Timed | Divines, Overload, Smelling salts, Anti-venom, Antifire, Prayer regeneration, Prayer enhance, Liquid adrenaline, Menaphite remedy, Stamina, Goading | Before they run out |
 | Heart | Imbued and saturated heart | When it's ready and your Magic is low |
-| Prayer | Prayer pots, super restores, sanfew, revitalisation | At your **Alert at prayer** |
+| Prayer | Prayer pots, super restores, sanfew, revitalisation, Tears of Elidinis, Blessed crystal scarab | At your **Alert at prayer** |
 
 Anti-venom and antifire also warn once when they run out, even if you have none left, so you know to teleport.
 
@@ -26,5 +27,6 @@ Anti-venom and antifire also warn once when they run out, even if you have none 
 - Add your own `.wav` sounds from the Pot Alert sidebar tab
 - Set **Remind again every** if you want repeat warnings (0 means one warning only)
 - Use the pot's real color, or pick your own
+- **Brighten dark potions** (on by default) lightens dark colors like anti-venom and overload so the glow stands out
 
 The sidebar tab also has a **Test** button to preview any pot's warning.
