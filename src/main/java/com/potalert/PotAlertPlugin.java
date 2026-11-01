@@ -17,11 +17,15 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.EnumComposition;
+import net.runelite.api.EnumID;
 import net.runelite.api.GameState;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.ParamID;
 import net.runelite.api.Player;
 import net.runelite.api.Skill;
+import net.runelite.api.StructComposition;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -134,6 +138,8 @@ public class PotAlertPlugin extends Plugin
 		boolean timerSeen;
 
 		boolean expiryPending;
+
+		boolean heldForWeapon;
 
 		boolean divineRunning;
 
@@ -459,6 +465,7 @@ public class PotAlertPlugin extends Plugin
 		boolean banking = isOpen(InterfaceID.Bankmain.UNIVERSE) || isOpen(InterfaceID.BankDepositbox.UNIVERSE)
 			|| isOpen(InterfaceID.GeOffers.UNIVERSE);
 		Map<AlertType, Integer> pots = findPots();
+		Style holding = config.matchWeapon() ? currentStyle() : Style.ANY;
 
 		List<Color> colors = new ArrayList<>();
 		Set<Integer> soundedPots = new HashSet<>();
@@ -499,7 +506,10 @@ public class PotAlertPlugin extends Plugin
 			boolean trigger = (state.armed && needs) || expiry;
 			boolean remind = remindTicks > 0 && needs && state.firedTick >= 0 && tick - state.firedTick >= remindTicks;
 
-			if ((trigger || remind) && (combatOk || type.getKind() == AlertType.Kind.SKILL) && !heldForLogin)
+			boolean styleOk = holding == Style.ANY || styleFor(type) == Style.ANY || styleFor(type) == holding;
+			state.heldForWeapon = state.armed && needs && !styleOk;
+
+			if ((trigger || remind) && (combatOk || type.getKind() == AlertType.Kind.SKILL) && styleOk && !heldForLogin)
 			{
 				state.armed = false;
 				state.expiryPending = false;
@@ -572,7 +582,7 @@ public class PotAlertPlugin extends Plugin
 				{
 					divineLeft = Math.max(divineLeft, client.getVarbitValue(varbit));
 				}
-				if (state.divineRunning && divineLeft == 0)
+				if (state.divineRunning && divineLeft == 0 && !state.heldForWeapon)
 				{
 					state.armed = false;
 					state.noArmUntil = tick + 5;
@@ -581,6 +591,79 @@ public class PotAlertPlugin extends Plugin
 				boolean divineEnding = divineLeft > 0 && divineLeft <= warnTicks;
 				return statIsLow(type) || divineEnding;
 			}
+		}
+	}
+
+	private enum Style
+	{
+		MELEE, RANGED, MAGIC, ANY
+	}
+
+	private static Style styleFor(AlertType type)
+	{
+		switch (type)
+		{
+			case ATTACK:
+			case STRENGTH:
+			case COMBAT:
+			case ZAMORAK:
+				return Style.MELEE;
+			case RANGED:
+			case BASTION:
+				return Style.RANGED;
+			case MAGIC:
+			case BATTLEMAGE:
+			case HEART:
+				return Style.MAGIC;
+			default:
+				return Style.ANY;
+		}
+	}
+
+	private Style currentStyle()
+	{
+		int weaponType = client.getVarbitValue(VarbitID.COMBAT_WEAPON_CATEGORY);
+		if (weaponType == 23 || weaponType == 24)
+		{
+			return Style.MAGIC;
+		}
+		int index = client.getVarpValue(VarPlayerID.COM_MODE);
+		if (index == 4)
+		{
+			index += client.getVarbitValue(VarbitID.AUTOCAST_DEFMODE);
+		}
+
+		EnumComposition weaponStyles = client.getEnum(EnumID.WEAPON_STYLES);
+		int styleEnum = weaponStyles == null ? -1 : weaponStyles.getIntValue(weaponType);
+		if (styleEnum == -1)
+		{
+			return weaponType == 22 && index >= 4 ? Style.MAGIC : Style.MELEE;
+		}
+		EnumComposition styles = client.getEnum(styleEnum);
+		int[] structs = styles == null ? new int[0] : styles.getIntVals();
+		if (index < 0 || index >= structs.length)
+		{
+			return Style.ANY;
+		}
+		StructComposition struct = client.getStructComposition(structs[index]);
+		String name = struct == null ? null : struct.getStringValue(ParamID.ATTACK_STYLE_NAME);
+		if (name == null)
+		{
+			return Style.ANY;
+		}
+		switch (name.toLowerCase())
+		{
+			case "ranging":
+			case "longrange":
+				return Style.RANGED;
+			case "casting":
+				return Style.MAGIC;
+			case "defensive":
+				return index == 5 ? Style.MAGIC : Style.MELEE;
+			case "other":
+				return Style.ANY;
+			default:
+				return Style.MELEE;
 		}
 	}
 

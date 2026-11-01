@@ -65,10 +65,11 @@ class PotAlertPanel extends PluginPanel
 		+ "<b>Anti-venom, antifire:</b> before they run out, and once more when they do<br><br>"
 		+ "<font color='#ff981f'><b>Tips</b></font><br>"
 		+ "&bull; Want repeats? Set <i>Remind again every</i>. 0 means one warning only<br>"
-		+ "&bull; Sound <i>Off</i> = glow only<br>"
+		+ "&bull; Sound <i>Off</i> = glow only for that pot. <i>Volume</i> 0 mutes them all<br>"
 		+ "&bull; <i>Brighten dark potions</i> (on by default) lightens dark colors like anti-venom so the glow is easy to see<br>"
 		+ "&bull; Quiet at the bank and GE<br>"
 		+ "&bull; Fishing, Hunter and Agility pots warn even with <i>Only in combat</i> on<br>"
+		+ "&bull; <i>Match my weapon</i> (off by default) only warns for the style you're holding. Other boosts wait until you swap<br>"
 		+ "&bull; Raid pots count as their normal versions"
 		+ CLOSE;
 

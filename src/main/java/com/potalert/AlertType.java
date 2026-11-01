@@ -27,7 +27,7 @@ public enum AlertType
 
 	RANGED("ranged", "Ranging", Kind.BOOST, new Skill[]{Skill.RANGED}, new Color(0x2E8FB8), AlertSound.DRINK,
 		ItemID._4DOSERANGERSPOTION, new int[]{VarbitID.DIVINERANGE_POTION_TIME},
-		"ranging potion", "super ranging", "ranging mix"),
+		"ranging potion", "super ranging", "ranging mix", "armadyl brew"),
 
 	BASTION("bastion", "Bastion", Kind.BOOST, new Skill[]{Skill.RANGED}, new Color(0xB86B2E), AlertSound.DRINK,
 		ItemID._4DOSEBASTION, new int[]{VarbitID.DIVINEBASTION_POTION_TIME},
@@ -41,11 +41,11 @@ public enum AlertType
 		ItemID._4DOSEBATTLEMAGE, new int[]{VarbitID.DIVINEBATTLEMAGE_POTION_TIME},
 		"battlemage potion", "kodai (", "kodai potion"),
 
-	ZAMORAK("zamorak", "Zamorak brew", Kind.BOOST, new Skill[]{Skill.ATTACK, Skill.STRENGTH}, new Color(0xB8862E), AlertSound.DRINK,
+	ZAMORAK("zamorak", "Zamorak brew", Kind.BOOST, new Skill[]{Skill.ATTACK, Skill.STRENGTH}, new Color(0xB8862E), AlertSound.ZAMORAK_FLAMES,
 		ItemID._4DOSEPOTIONOFZAMORAK, new int[0],
 		"zamorak brew", "zamorak mix"),
 
-	HEART("heart", "Heart", Kind.HEART, new Skill[]{Skill.MAGIC}, new Color(0xC23A6B), AlertSound.DRINK,
+	HEART("heart", "Heart", Kind.HEART, new Skill[]{Skill.MAGIC}, new Color(0xC23A6B), AlertSound.CHARGE,
 		ItemID.IMBUED_HEART, new int[0],
 		"imbued heart", "saturated heart"),
 
@@ -53,51 +53,51 @@ public enum AlertType
 		ItemID.NZONE4DOSEOVERLOADPOTION, new int[0],
 		"overload"),
 
-	SALTS("salts", "Smelling salts", Kind.TIMED, new Skill[0], new Color(0xD8C27A), AlertSound.DRINK,
+	SALTS("salts", "Smelling salts", Kind.TIMED, new Skill[0], new Color(0xD8C27A), AlertSound.SALT,
 		ItemID.TOA_SUPPLY_STATS_2, new int[0],
 		"smelling salts"),
 
-	POISON("poison", "Anti-venom", Kind.TIMED, new Skill[0], new Color(0x1D2B22), AlertSound.DRINK,
+	POISON("poison", "Anti-venom", Kind.TIMED, new Skill[0], new Color(0x1D2B22), AlertSound.SNAKE_HISS,
 		ItemID.ANTIVENOM_4, new int[0],
 		"antipoison", "anti-venom", "antidote", "sanfew"),
 
-	ANTIFIRE("antifire", "Antifire", Kind.TIMED, new Skill[0], new Color(0x8A3B6E), AlertSound.DRINK,
+	ANTIFIRE("antifire", "Antifire", Kind.TIMED, new Skill[0], new Color(0x8A3B6E), AlertSound.DRAGON_BREATH,
 		ItemID._4DOSE3ANTIDRAGON, new int[0],
 		"antifire"),
 
-	PRAYER_REGEN("prayerregen", "Prayer regen", Kind.TIMED, new Skill[0], new Color(0x5FB8E0), AlertSound.DRINK,
+	PRAYER_REGEN("prayerregen", "Prayer regen", Kind.TIMED, new Skill[0], new Color(0x5FB8E0), AlertSound.PRAYER_RECHARGE,
 		ItemID._4DOSE1PRAYER_REGENERATION, new int[0],
 		"prayer regeneration"),
 
-	ENHANCE("enhance", "Prayer enhance", Kind.TIMED, new Skill[0], new Color(0x9B59D0), AlertSound.DRINK,
+	ENHANCE("enhance", "Prayer enhance", Kind.TIMED, new Skill[0], new Color(0x9B59D0), AlertSound.PRAYER_BOOST,
 		ItemID.RAIDS_VIAL_PRAYER_WEAK_4, new int[0],
 		"prayer enhance"),
 
-	ADRENALINE("adrenaline", "Adrenaline", Kind.TIMED, new Skill[0], new Color(0xD9534F), AlertSound.DRINK,
+	ADRENALINE("adrenaline", "Adrenaline", Kind.TIMED, new Skill[0], new Color(0xD9534F), AlertSound.ROAR,
 		ItemID.TOA_SUPPLY_ENERGY_2, new int[0],
 		"liquid adrenaline"),
 
-	REMEDY("remedy", "Menaphite", Kind.TIMED, new Skill[0], new Color(0xC9A227), AlertSound.DRINK,
+	REMEDY("remedy", "Menaphite", Kind.TIMED, new Skill[0], new Color(0xC9A227), AlertSound.HEAL,
 		ItemID._4DOSESTATRENEWAL, new int[0],
 		"menaphite remedy"),
 
-	STAMINA("stamina", "Stamina", Kind.TIMED, new Skill[0], new Color(0x9C6B3C), AlertSound.DRINK,
+	STAMINA("stamina", "Stamina", Kind.TIMED, new Skill[0], new Color(0x9C6B3C), AlertSound.ENERGY_DRAIN,
 		ItemID._4DOSESTAMINA, new int[0],
 		"stamina"),
 
-	GOADING("goading", "Goading", Kind.TIMED, new Skill[0], new Color(0xC0392B), AlertSound.DRINK,
+	GOADING("goading", "Goading", Kind.TIMED, new Skill[0], new Color(0xC0392B), AlertSound.GROWL,
 		ItemID._4DOSEGOADING, new int[0],
 		"goading"),
 
-	FISHING("fishing", "Fishing", Kind.SKILL, new Skill[]{Skill.FISHING}, new Color(0x3A7BD5), AlertSound.DRINK,
+	FISHING("fishing", "Fishing", Kind.SKILL, new Skill[]{Skill.FISHING}, new Color(0x3A7BD5), AlertSound.FISHING_CAST,
 		ItemID._4DOSEFISHERSPOTION, new int[0],
 		"fishing potion", "fishing mix"),
 
-	HUNTER("hunter", "Hunter", Kind.SKILL, new Skill[]{Skill.HUNTER}, new Color(0x7A9A3A), AlertSound.DRINK,
+	HUNTER("hunter", "Hunter", Kind.SKILL, new Skill[]{Skill.HUNTER}, new Color(0x7A9A3A), AlertSound.BIRD_CALL,
 		ItemID._4DOSEHUNTING, new int[0],
 		"hunter potion"),
 
-	AGILITY("agility", "Agility", Kind.SKILL, new Skill[]{Skill.AGILITY}, new Color(0x3AB8A0), AlertSound.DRINK,
+	AGILITY("agility", "Agility", Kind.SKILL, new Skill[]{Skill.AGILITY}, new Color(0x3AB8A0), AlertSound.JUMP,
 		ItemID._4DOSE1AGILITY, new int[0],
 		"agility potion", "agility mix"),
 

@@ -30,10 +30,17 @@ public interface PotAlertConfig extends Config
 		return false;
 	}
 
+	@ConfigItem(keyName = "matchWeapon", name = "Match my weapon",
+		description = "Combat boosts only warn for the style you're holding. The others wait and warn when you swap to that weapon", section = generalSection, position = 2)
+	default boolean matchWeapon()
+	{
+		return false;
+	}
+
 	@Range(min = 1, max = 60)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "combatTimeout", name = "Combat timeout",
-		description = "How long after your last attack you still count as in combat", section = generalSection, position = 2)
+		description = "How long after your last attack you still count as in combat", section = generalSection, position = 3)
 	default int combatTimeout()
 	{
 		return 10;
@@ -42,16 +49,16 @@ public interface PotAlertConfig extends Config
 	@Range(min = 0, max = 120)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "warnSeconds", name = "Warn before expiry",
-		description = "How many seconds before a timed pot runs out to warn you", section = generalSection, position = 3)
+		description = "How many seconds before a timed pot runs out to warn you", section = generalSection, position = 4)
 	default int warnSeconds()
 	{
-		return 20;
+		return 15;
 	}
 
 	@Range(min = 1, max = 60)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "alertDuration", name = "Warning glow",
-		description = "How long the screen glows for each warning. It stops early once you sip", section = generalSection, position = 4)
+		description = "How long the screen glows for each warning. It stops early once you sip", section = generalSection, position = 5)
 	default int alertDuration()
 	{
 		return 8;
@@ -60,7 +67,7 @@ public interface PotAlertConfig extends Config
 	@Range(min = 0, max = 300)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "remindEvery", name = "Remind again every",
-		description = "How often to repeat the warning until you drink. Leave at 0 for just one warning", section = generalSection, position = 5)
+		description = "How often to repeat the warning until you drink. Leave at 0 for just one warning", section = generalSection, position = 6)
 	default int remindEvery()
 	{
 		return 0;
@@ -69,10 +76,10 @@ public interface PotAlertConfig extends Config
 	@Range(min = 0, max = 100)
 	@Units(Units.PERCENT)
 	@ConfigItem(keyName = "volume", name = "Volume",
-		description = "Alert volume. Plays even if your in-game sound effects are muted", section = generalSection, position = 6)
+		description = "Alert volume. Plays even if your in-game sound effects are muted. Set to 0 to mute all sounds (glow only)", section = generalSection, position = 7)
 	default int volume()
 	{
-		return 70;
+		return 50;
 	}
 
 	@ConfigSection(name = "Edge glow", description = "How the screen edge glow looks", position = 1)
@@ -280,7 +287,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Ranging", description = "Ranging and divine ranging pots", position = 6, closedByDefault = true)
+	@ConfigSection(name = "Ranging", description = "Ranging, divine ranging pots and Armadyl brew", position = 6, closedByDefault = true)
 	String rangedSection = "ranged";
 
 	@ConfigItem(keyName = "rangedEnabled", name = "Enabled", description = "", section = rangedSection, position = 0)
