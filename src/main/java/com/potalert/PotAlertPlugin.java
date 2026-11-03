@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -115,6 +116,16 @@ public class PotAlertPlugin extends Plugin
 	private int nextAntifireTick = -1;
 	private int nextSuperAntifireTick = -1;
 	private int nextOverloadTick = -1;
+
+	private static final Map<Integer, Integer> CHUNKED_TIMERS = Map.of(
+		VarbitID.TOA_MIDRAIDLOOT_STATS_TIMER, 25,
+		VarbitID.PRAYER_REGENERATION_POTION_TIMER, 12,
+		VarbitID.STATRENEWAL_POTION_TIMER, 25,
+		VarbitID.GOADING_POTION_TIMER, 6,
+		VarbitID.STAMINA_DURATION, 10);
+
+	private final Map<Integer, Integer> nextChunkTick = new HashMap<>();
+	private final Map<Integer, Integer> lastChunkValue = new HashMap<>();
 	private boolean venomPhase;
 	private boolean waitingForFirstFight = true;
 	private int enhanceEndTick = -1;
@@ -229,6 +240,8 @@ public class PotAlertPlugin extends Plugin
 		nextAntifireTick = -1;
 		nextSuperAntifireTick = -1;
 		nextOverloadTick = -1;
+		nextChunkTick.clear();
+		lastChunkValue.clear();
 		venomPhase = false;
 		enhanceEndTick = -1;
 		adrenalineEndTick = -1;
@@ -423,6 +436,20 @@ public class PotAlertPlugin extends Plugin
 			|| varbit == VarbitID.DEADMAN_OVERLOAD_POTION_EFFECTS)
 		{
 			nextOverloadTick = nextTimerTick(nextOverloadTick, Math.max(0, value), tick, OVERLOAD_TICK_LENGTH);
+		}
+		else if (CHUNKED_TIMERS.containsKey(varbit))
+		{
+			int last = lastChunkValue.getOrDefault(varbit, 0);
+			int next = nextChunkTick.getOrDefault(varbit, -1);
+			if (value <= 0)
+			{
+				nextChunkTick.remove(varbit);
+			}
+			else if (value < last || next <= tick)
+			{
+				nextChunkTick.put(varbit, tick + CHUNKED_TIMERS.get(varbit));
+			}
+			lastChunkValue.put(varbit, value);
 		}
 	}
 
@@ -706,18 +733,15 @@ public class PotAlertPlugin extends Plugin
 				return overloadRemaining();
 			case SALTS:
 			{
-				int salts = client.getVarbitValue(VarbitID.TOA_MIDRAIDLOOT_STATS_TIMER);
-				return salts > 0 ? salts * 25 : -1;
+				return chunkRemaining(VarbitID.TOA_MIDRAIDLOOT_STATS_TIMER);
 			}
 			case PRAYER_REGEN:
 			{
-				int regen = client.getVarbitValue(VarbitID.PRAYER_REGENERATION_POTION_TIMER);
-				return regen > 0 ? regen * 12 : -1;
+				return chunkRemaining(VarbitID.PRAYER_REGENERATION_POTION_TIMER);
 			}
 			case REMEDY:
 			{
-				int remedy = client.getVarbitValue(VarbitID.STATRENEWAL_POTION_TIMER);
-				return remedy > 0 ? remedy * 25 : -1;
+				return chunkRemaining(VarbitID.STATRENEWAL_POTION_TIMER);
 			}
 			case ENHANCE:
 				return endTickRemaining(enhanceEndTick);
@@ -725,12 +749,11 @@ public class PotAlertPlugin extends Plugin
 				return endTickRemaining(adrenalineEndTick);
 			case GOADING:
 			{
-				int goading = client.getVarbitValue(VarbitID.GOADING_POTION_TIMER);
-				return goading > 0 ? goading * 6 : -1;
+				return chunkRemaining(VarbitID.GOADING_POTION_TIMER);
 			}
 			case STAMINA:
 				return client.getVarbitValue(VarbitID.STAMINA_ACTIVE) == 1
-					? Math.max(1, client.getVarbitValue(VarbitID.STAMINA_DURATION) * 10) : -1;
+					? Math.max(1, chunkRemaining(VarbitID.STAMINA_DURATION)) : -1;
 			default:
 				return -1;
 		}
@@ -784,6 +807,23 @@ public class PotAlertPlugin extends Plugin
 			remaining = Math.max(remaining, Math.max(0, nextSuperAntifireTick - tick) + (superAntifire - 1) * SUPER_ANTIFIRE_TICK_LENGTH);
 		}
 
+		return remaining == 0 ? 1 : remaining;
+	}
+
+	private int chunkRemaining(int varbit)
+	{
+		int value = client.getVarbitValue(varbit);
+		if (value <= 0)
+		{
+			return -1;
+		}
+		int length = CHUNKED_TIMERS.get(varbit);
+		int next = nextChunkTick.getOrDefault(varbit, -1);
+		if (next < 0)
+		{
+			return value * length;
+		}
+		int remaining = Math.max(0, next - client.getTickCount()) + (value - 1) * length;
 		return remaining == 0 ? 1 : remaining;
 	}
 
