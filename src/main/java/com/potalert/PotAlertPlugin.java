@@ -65,6 +65,9 @@ import net.runelite.client.util.Text;
 )
 public class PotAlertPlugin extends Plugin
 {
+
+	// Timer math below matches RuneLite's own Timers & Buffs plugin.
+	// Poison varp: negative = immunity. Below -38 is anti-venom, -38 to -1 is antipoison only.
 	private static final int VENOM_VALUE_CUTOFF = -38;
 	private static final int POISON_TICK_LENGTH = 30;
 	private static final int ANTIFIRE_TICK_LENGTH = 30;
@@ -74,6 +77,7 @@ public class PotAlertPlugin extends Plugin
 		VarbitID.NZONE_OVERLOAD_POTION_EFFECTS, VarbitID.RAIDS_OVERLOAD_TIMER, VarbitID.DEADMAN_OVERLOAD_POTION_EFFECTS
 	};
 
+	/** How long a test button shows its alert */
 	private static final long PREVIEW_MILLIS = 5000;
 
 	@Inject
@@ -116,14 +120,14 @@ public class PotAlertPlugin extends Plugin
 	private int nextAntifireTick = -1;
 	private int nextSuperAntifireTick = -1;
 	private int nextOverloadTick = -1;
-
+	/** Timers the game only updates in chunks, by varbit: ticks per chunk */
 	private static final Map<Integer, Integer> CHUNKED_TIMERS = Map.of(
 		VarbitID.TOA_MIDRAIDLOOT_STATS_TIMER, 25,
 		VarbitID.PRAYER_REGENERATION_POTION_TIMER, 12,
 		VarbitID.STATRENEWAL_POTION_TIMER, 25,
 		VarbitID.GOADING_POTION_TIMER, 6,
 		VarbitID.STAMINA_DURATION, 10);
-
+	/** When each chunked timer next ticks down, so we can count the ticks in between */
 	private final Map<Integer, Integer> nextChunkTick = new HashMap<>();
 	private final Map<Integer, Integer> lastChunkValue = new HashMap<>();
 	private boolean venomPhase;
@@ -131,34 +135,39 @@ public class PotAlertPlugin extends Plugin
 	private int enhanceEndTick = -1;
 	private int adrenalineEndTick = -1;
 
+	/** Colors of the alerts currently up, read by the overlay. */
 	private volatile List<Color> activeColors = Collections.emptyList();
 
+	// Test button state
 	private volatile Color previewColor;
 	private volatile long previewUntil;
 
 	private static class AlertState
 	{
+		/** Ready to warn the next time this pot is needed */
 		boolean armed;
-
+		/** Tick the last warning started, or -1 */
 		int firedTick = -1;
-
+		/** The last warning was for protection running out */
 		boolean firedForExpiry;
-
+		/** A countdown was running last tick */
 		boolean running;
-
+		/** A countdown has been seen since logging in */
 		boolean timerSeen;
-
+		/** Anti-venom or antifire just ran out, warn once */
 		boolean expiryPending;
-
+		/** A warning is waiting for you to swap to the matching weapon */
 		boolean heldForWeapon;
-
+		/** A divine was running last tick */
 		boolean divineRunning;
-
+		/** Don't re-arm before this tick, so a divine ending doesn't warn twice */
 		int noArmUntil;
 
 		AlertState(AlertType type)
 		{
-			armed = type.getKind() != AlertType.Kind.BOOST && type.getKind() != AlertType.Kind.SKILL;
+			// Boosts and absorption wait until you've drunk one, so a pot you're saving stays quiet
+			armed = type.getKind() != AlertType.Kind.BOOST && type.getKind() != AlertType.Kind.SKILL
+				&& type.getKind() != AlertType.Kind.ABSORB;
 		}
 	}
 
@@ -248,6 +257,7 @@ public class PotAlertPlugin extends Plugin
 		waitingForFirstFight = true;
 	}
 
+	/** What the overlay should draw right now: a test alert if one is running, otherwise the real alerts. */
 	List<Color> getDisplayColors()
 	{
 		Color preview = previewColor;
@@ -258,6 +268,9 @@ public class PotAlertPlugin extends Plugin
 		return activeColors;
 	}
 
+	// Test buttons
+
+	/** Called from the sidebar. Shows that alert's glow and plays its sound for a few seconds. */
 	void preview(AlertType type)
 	{
 		previewUntil = 0;
@@ -322,6 +335,8 @@ public class PotAlertPlugin extends Plugin
 		return count > 1;
 	}
 
+	// Events
+
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
@@ -334,6 +349,8 @@ public class PotAlertPlugin extends Plugin
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
 	{
+		// Only reset on a real logout or world hop. Teleports and portals also
+		// show a loading screen, and those shouldn't restart your alerts.
 		GameState gs = event.getGameState();
 		if (gs == GameState.LOGIN_SCREEN || gs == GameState.HOPPING)
 		{
@@ -348,6 +365,11 @@ public class PotAlertPlugin extends Plugin
 		}
 	}
 
+	/**
+	 * You only count as in combat once there's real contact: your attack lands
+	 * on something (hit or 0), or something hits you. Clicking an NPC doesn't
+	 * count, and isMine() leaves out poison and venom damage.
+	 */
 	@Subscribe
 	public void onHitsplatApplied(HitsplatApplied event)
 	{
@@ -364,6 +386,7 @@ public class PotAlertPlugin extends Plugin
 		waitingForFirstFight = false;
 	}
 
+	/** A spell splashing on your target is real contact too, it just doesn't make a hitsplat. */
 	@Subscribe
 	public void onGraphicChanged(GraphicChanged event)
 	{
@@ -447,6 +470,7 @@ public class PotAlertPlugin extends Plugin
 			}
 			else if (value < last || next <= tick)
 			{
+				// It just ticked down (or started fresh), so the next step is a full chunk away
 				nextChunkTick.put(varbit, tick + CHUNKED_TIMERS.get(varbit));
 			}
 			lastChunkValue.put(varbit, value);
@@ -506,6 +530,7 @@ public class PotAlertPlugin extends Plugin
 				continue;
 			}
 
+			// One warning per drain: a pot fires once, then re-arms after you drink and it's no longer low
 			boolean needs = needsSip(type, state, warnTicks, tick);
 			boolean expiry = state.expiryPending;
 			if (!needs && !expiry && tick >= state.noArmUntil)
@@ -524,6 +549,7 @@ public class PotAlertPlugin extends Plugin
 			}
 			if (potId == null)
 			{
+				// Nothing to drink, so nothing to warn about
 				state.expiryPending = false;
 				continue;
 			}
@@ -533,6 +559,7 @@ public class PotAlertPlugin extends Plugin
 			boolean trigger = (state.armed && needs) || expiry;
 			boolean remind = remindTicks > 0 && needs && state.firedTick >= 0 && tick - state.firedTick >= remindTicks;
 
+			// With Match my weapon on, a boost for another style waits here until you swap
 			boolean styleOk = holding == Style.ANY || styleFor(type) == Style.ANY || styleFor(type) == holding;
 			state.heldForWeapon = state.armed && needs && !styleOk;
 
@@ -566,6 +593,8 @@ public class PotAlertPlugin extends Plugin
 		activeColors = colors;
 	}
 
+	// Checks
+
 	private boolean needsSip(AlertType type, AlertState state, int warnTicks, int tick)
 	{
 		switch (type.getKind())
@@ -575,6 +604,18 @@ public class PotAlertPlugin extends Plugin
 
 			case HEART:
 				return client.getVarbitValue(VarbitID.IMBUED_HEART_TIMER) == 0 && statIsLow(type);
+
+			case ABSORB:
+			{
+				int points = client.getVarbitValue(VarbitID.NZONE_ABSORB_POTION_EFFECTS);
+				if (points == 0)
+				{
+					// Outside NMZ, or a fresh dream. Stay quiet until you've drunk above the threshold
+					state.armed = false;
+					return true;
+				}
+				return points <= config.absorptionThreshold();
+			}
 
 			case TIMED:
 			{
@@ -647,9 +688,11 @@ public class PotAlertPlugin extends Plugin
 		}
 	}
 
+	/** Reads your attack style the same way RuneLite's Attack Styles plugin does */
 	private Style currentStyle()
 	{
 		int weaponType = client.getVarbitValue(VarbitID.COMBAT_WEAPON_CATEGORY);
+		// Powered staves (trident, sang, shadow) always attack with magic, whatever the style says
 		if (weaponType == 23 || weaponType == 24)
 		{
 			return Style.MAGIC;
@@ -721,6 +764,7 @@ public class PotAlertPlugin extends Plugin
 		return lowest;
 	}
 
+	/** Ticks left on a timed pot, or -1 if nothing is running */
 	private int timedRemaining(AlertType type, int poisonValue)
 	{
 		switch (type)
@@ -759,6 +803,7 @@ public class PotAlertPlugin extends Plugin
 		}
 	}
 
+	/** Ticks of the immunity you care about. Once anti-venom's venom part ends, that counts as expired. */
 	private int poisonRemaining(int value)
 	{
 		if (value == 0)
@@ -775,6 +820,7 @@ public class PotAlertPlugin extends Plugin
 		}
 		if (venomPhase)
 		{
+			// Venom protection ran out, only poison protection left
 			return -1;
 		}
 		return base + Math.abs((value + 1) * POISON_TICK_LENGTH);
@@ -807,9 +853,11 @@ public class PotAlertPlugin extends Plugin
 			remaining = Math.max(remaining, Math.max(0, nextSuperAntifireTick - tick) + (superAntifire - 1) * SUPER_ANTIFIRE_TICK_LENGTH);
 		}
 
+		// A value of 1 with the next tick already passed would read as 0, keep it alive
 		return remaining == 0 ? 1 : remaining;
 	}
 
+	/** Ticks left on a timer the game only updates in chunks, counting the ticks since its last update */
 	private int chunkRemaining(int varbit)
 	{
 		int value = client.getVarbitValue(varbit);
@@ -842,6 +890,7 @@ public class PotAlertPlugin extends Plugin
 		return remaining == 0 ? 1 : remaining;
 	}
 
+	/** First matching pot in the inventory for each alert type. */
 	private Map<AlertType, Integer> findPots()
 	{
 		Map<AlertType, Integer> found = new EnumMap<>(AlertType.class);
@@ -869,6 +918,7 @@ public class PotAlertPlugin extends Plugin
 		return found;
 	}
 
+	/** Anti-venom and antifire can warn with none left, so you know to teleport out */
 	private boolean warnWithoutPot(AlertType type)
 	{
 		switch (type)
@@ -879,6 +929,7 @@ public class PotAlertPlugin extends Plugin
 		}
 	}
 
+	/** Levels above base to resip at when "Resip at level" is set to 0 */
 	private static int autoBoost(AlertType type)
 	{
 		switch (type)
@@ -895,6 +946,8 @@ public class PotAlertPlugin extends Plugin
 		}
 	}
 
+	// Config lookups
+
 	private boolean isEnabled(AlertType type)
 	{
 		switch (type)
@@ -910,6 +963,7 @@ public class PotAlertPlugin extends Plugin
 			case ZAMORAK: return config.zamorakEnabled();
 			case HEART: return config.heartEnabled();
 			case OVERLOAD: return config.overloadEnabled();
+			case ABSORPTION: return config.absorptionEnabled();
 			case SALTS: return config.saltsEnabled();
 			case POISON: return config.poisonEnabled();
 			case ANTIFIRE: return config.antifireEnabled();
@@ -963,6 +1017,7 @@ public class PotAlertPlugin extends Plugin
 			case ZAMORAK: return config.zamorakUsePotionColor();
 			case HEART: return config.heartUsePotionColor();
 			case OVERLOAD: return config.overloadUsePotionColor();
+			case ABSORPTION: return config.absorptionUsePotionColor();
 			case SALTS: return config.saltsUsePotionColor();
 			case POISON: return config.poisonUsePotionColor();
 			case ANTIFIRE: return config.antifireUsePotionColor();
@@ -995,6 +1050,7 @@ public class PotAlertPlugin extends Plugin
 			case ZAMORAK: return config.zamorakColor();
 			case HEART: return config.heartColor();
 			case OVERLOAD: return config.overloadColor();
+			case ABSORPTION: return config.absorptionColor();
 			case SALTS: return config.saltsColor();
 			case POISON: return config.poisonColor();
 			case ANTIFIRE: return config.antifireColor();
@@ -1027,6 +1083,7 @@ public class PotAlertPlugin extends Plugin
 			case ZAMORAK: return config.zamorakSound();
 			case HEART: return config.heartSound();
 			case OVERLOAD: return config.overloadSound();
+			case ABSORPTION: return config.absorptionSound();
 			case SALTS: return config.saltsSound();
 			case POISON: return config.poisonSound();
 			case ANTIFIRE: return config.antifireSound();
@@ -1059,6 +1116,7 @@ public class PotAlertPlugin extends Plugin
 			case ZAMORAK: return config.zamorakCustomFile();
 			case HEART: return config.heartCustomFile();
 			case OVERLOAD: return config.overloadCustomFile();
+			case ABSORPTION: return config.absorptionCustomFile();
 			case SALTS: return config.saltsCustomFile();
 			case POISON: return config.poisonCustomFile();
 			case ANTIFIRE: return config.antifireCustomFile();
@@ -1075,6 +1133,8 @@ public class PotAlertPlugin extends Plugin
 			default: return "";
 		}
 	}
+
+	// Color
 
 	private Color resolveColor(AlertType type, int potId)
 	{
@@ -1129,6 +1189,8 @@ public class PotAlertPlugin extends Plugin
 		}
 		return Color.getHSBColor(hsb[0], hsb[1], minBrightness);
 	}
+
+	// Sound
 
 	private void playSound(AlertType type)
 	{

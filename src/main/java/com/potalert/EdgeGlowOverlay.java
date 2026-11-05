@@ -12,6 +12,7 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
+/** Draws a pulsing glow around the edges of the game screen in the color of the pot you need */
 class EdgeGlowOverlay extends Overlay
 {
 	private final Client client;
@@ -39,6 +40,7 @@ class EdgeGlowOverlay extends Overlay
 
 		long now = System.currentTimeMillis();
 		int period = Math.max(200, config.pulseSpeed());
+		// With more than one alert up, the colors take turns, one per pulse
 		Color base = colors.get((int) ((now / period) % colors.size()));
 
 		double phase = (now % period) / (double) period;

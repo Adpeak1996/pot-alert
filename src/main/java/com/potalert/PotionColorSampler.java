@@ -3,6 +3,10 @@ package com.potalert;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
+/**
+ * Picks a potion's color from its inventory icon, so the glow matches the pot.
+ * Only looks at the lower part of the icon, where the liquid is, to skip the cork and glass.
+ */
 final class PotionColorSampler
 {
 	private static final int HUE_BUCKETS = 12;
@@ -81,6 +85,7 @@ final class PotionColorSampler
 		{
 			return new Color((int) (r[best] / count[best]), (int) (g[best] / count[best]), (int) (b[best] / count[best]));
 		}
+		// Mostly white or pale liquid, like super strength
 		if (lightCount * 10 >= allCount * 3)
 		{
 			return new Color((int) (lightR / lightCount), (int) (lightG / lightCount), (int) (lightB / lightCount));

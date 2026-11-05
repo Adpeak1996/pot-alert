@@ -62,6 +62,7 @@ class PotAlertPanel extends PluginPanel
 		+ "<b>Boosts and skilling pots:</b> at your <i>Resip at level</i><br>"
 		+ "<b>Timed pots:</b> before they run out<br>"
 		+ "<b>Prayer:</b> at your <i>Alert at prayer</i><br>"
+		+ "<b>Absorption:</b> at your <i>Alert at absorption</i>, once you've drunk above it<br>"
 		+ "<b>Anti-venom, antifire:</b> before they run out, and once more when they do<br><br>"
 		+ "<font color='#ff981f'><b>Tips</b></font><br>"
 		+ "&bull; Want repeats? Set <i>Remind again every</i>. 0 means one warning only<br>"

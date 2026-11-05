@@ -573,7 +573,49 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Smelling salts", description = "Tombs of Amascut smelling salts", position = 13, closedByDefault = true)
+	@ConfigSection(name = "Absorption", description = "NMZ absorption potions", position = 13, closedByDefault = true)
+	String absorptionSection = "absorption";
+
+	@ConfigItem(keyName = "absorptionEnabled", name = "Enabled", description = "", section = absorptionSection, position = 0)
+	default boolean absorptionEnabled()
+	{
+		return true;
+	}
+
+	@Range(min = 1, max = 1000)
+	@ConfigItem(keyName = "absorptionThreshold", name = "Alert at absorption",
+		description = "Alert when your absorption points drop to this. Only starts watching once you've drunk above it", section = absorptionSection, position = 1)
+	default int absorptionThreshold()
+	{
+		return 100;
+	}
+
+	@ConfigItem(keyName = "absorptionUsePotionColor", name = "Use potion color",
+		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = absorptionSection, position = 2)
+	default boolean absorptionUsePotionColor()
+	{
+		return true;
+	}
+
+	@ConfigItem(keyName = "absorptionColor", name = "Color", description = "Used when 'Use potion color' is off", section = absorptionSection, position = 3)
+	default Color absorptionColor()
+	{
+		return AlertType.ABSORPTION.getDefaultColor();
+	}
+
+	@ConfigItem(keyName = "absorptionSound", name = "Sound", description = "Off for glow only. A custom sound picked in the Pot Alert sidebar overrides this", section = absorptionSection, position = 4)
+	default AlertSound absorptionSound()
+	{
+		return AlertType.ABSORPTION.getDefaultSound();
+	}
+
+	@ConfigItem(keyName = "absorptionCustomFile", name = "Custom file", description = "", section = absorptionSection, position = 5, hidden = true)
+	default String absorptionCustomFile()
+	{
+		return "";
+	}
+
+	@ConfigSection(name = "Smelling salts", description = "Tombs of Amascut smelling salts", position = 14, closedByDefault = true)
 	String saltsSection = "salts";
 
 	@ConfigItem(keyName = "saltsEnabled", name = "Enabled", description = "", section = saltsSection, position = 0)
@@ -607,7 +649,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Anti-poison / venom", description = "Antipoison, antidote, anti-venom, sanfew", position = 14, closedByDefault = true)
+	@ConfigSection(name = "Anti-poison / venom", description = "Antipoison, antidote, anti-venom, sanfew", position = 15, closedByDefault = true)
 	String poisonSection = "poison";
 
 	@ConfigItem(keyName = "poisonEnabled", name = "Enabled", description = "", section = poisonSection, position = 0)
@@ -655,7 +697,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Antifire", description = "Antifire, super antifire, extended versions", position = 15, closedByDefault = true)
+	@ConfigSection(name = "Antifire", description = "Antifire, super antifire, extended versions", position = 16, closedByDefault = true)
 	String antifireSection = "antifire";
 
 	@ConfigItem(keyName = "antifireEnabled", name = "Enabled", description = "", section = antifireSection, position = 0)
@@ -696,7 +738,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Prayer regeneration", description = "Prayer regeneration potions", position = 16, closedByDefault = true)
+	@ConfigSection(name = "Prayer regeneration", description = "Prayer regeneration potions", position = 17, closedByDefault = true)
 	String prayerregenSection = "prayerregen";
 
 	@ConfigItem(keyName = "prayerregenEnabled", name = "Enabled", description = "", section = prayerregenSection, position = 0)
@@ -730,7 +772,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Prayer enhance", description = "Chambers of Xeric prayer enhance", position = 17, closedByDefault = true)
+	@ConfigSection(name = "Prayer enhance", description = "Chambers of Xeric prayer enhance", position = 18, closedByDefault = true)
 	String enhanceSection = "enhance";
 
 	@ConfigItem(keyName = "enhanceEnabled", name = "Enabled", description = "", section = enhanceSection, position = 0)
@@ -764,7 +806,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Liquid adrenaline", description = "Tombs of Amascut liquid adrenaline", position = 18, closedByDefault = true)
+	@ConfigSection(name = "Liquid adrenaline", description = "Tombs of Amascut liquid adrenaline", position = 19, closedByDefault = true)
 	String adrenalineSection = "adrenaline";
 
 	@ConfigItem(keyName = "adrenalineEnabled", name = "Enabled", description = "", section = adrenalineSection, position = 0)
@@ -798,7 +840,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Menaphite remedy", description = "Menaphite remedy", position = 19, closedByDefault = true)
+	@ConfigSection(name = "Menaphite remedy", description = "Menaphite remedy", position = 20, closedByDefault = true)
 	String remedySection = "remedy";
 
 	@ConfigItem(keyName = "remedyEnabled", name = "Enabled", description = "", section = remedySection, position = 0)
@@ -832,7 +874,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Stamina", description = "Stamina potions and mixes", position = 20, closedByDefault = true)
+	@ConfigSection(name = "Stamina", description = "Stamina potions and mixes", position = 21, closedByDefault = true)
 	String staminaSection = "stamina";
 
 	@ConfigItem(keyName = "staminaEnabled", name = "Enabled", description = "", section = staminaSection, position = 0)
@@ -866,7 +908,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Goading", description = "Goading potions", position = 21, closedByDefault = true)
+	@ConfigSection(name = "Goading", description = "Goading potions", position = 22, closedByDefault = true)
 	String goadingSection = "goading";
 
 	@ConfigItem(keyName = "goadingEnabled", name = "Enabled", description = "", section = goadingSection, position = 0)
@@ -900,7 +942,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Fishing", description = "Fishing and super fishing potions. Warns even with Only in combat on", position = 22, closedByDefault = true)
+	@ConfigSection(name = "Fishing", description = "Fishing and super fishing potions. Warns even with Only in combat on", position = 23, closedByDefault = true)
 	String fishingSection = "fishing";
 
 	@ConfigItem(keyName = "fishingEnabled", name = "Enabled", description = "", section = fishingSection, position = 0)
@@ -942,7 +984,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Hunter", description = "Hunter and super hunter potions. Warns even with Only in combat on", position = 23, closedByDefault = true)
+	@ConfigSection(name = "Hunter", description = "Hunter and super hunter potions. Warns even with Only in combat on", position = 24, closedByDefault = true)
 	String hunterSection = "hunter";
 
 	@ConfigItem(keyName = "hunterEnabled", name = "Enabled", description = "", section = hunterSection, position = 0)
@@ -984,7 +1026,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Agility", description = "Agility potions and mixes. Warns even with Only in combat on", position = 24, closedByDefault = true)
+	@ConfigSection(name = "Agility", description = "Agility potions and mixes. Warns even with Only in combat on", position = 25, closedByDefault = true)
 	String agilitySection = "agility";
 
 	@ConfigItem(keyName = "agilityEnabled", name = "Enabled", description = "", section = agilitySection, position = 0)
@@ -1026,7 +1068,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Prayer", description = "Prayer pots, super restores, sanfew, CoX revitalisation, ToA tears of Elidinis and scarabs", position = 25, closedByDefault = true)
+	@ConfigSection(name = "Prayer", description = "Prayer pots, super restores, sanfew, CoX revitalisation, ToA tears of Elidinis and scarabs", position = 26, closedByDefault = true)
 	String prayerSection = "prayer";
 
 	@ConfigItem(keyName = "prayerEnabled", name = "Enabled", description = "", section = prayerSection, position = 0)

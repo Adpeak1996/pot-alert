@@ -15,6 +15,7 @@ Your screen edge glows in the color of the potion you need, with a sound, when i
 - **Skilling boosts** at your *Resip at level*: Fishing, Hunter and Agility, including super versions
 - **Timed pots** before they run out: Divines, Overload, Smelling salts, Anti-venom, Antifire, Prayer regeneration, Prayer enhance, Liquid adrenaline, Menaphite remedy, Stamina and Goading
 - **Prayer** at your *Alert at prayer*: Prayer pots, super restores, sanfew, revitalisation, Tears of Elidinis and Blessed crystal scarab
+- **Absorption** at your *Alert at absorption*: NMZ absorption potions. It only starts watching once you've drunk above that number, so starting a dream won't set it off
 - **Imbued and saturated heart** when the heart is ready and your Magic is low
 
 Anti-venom and antifire also warn once when they run out, even if you have none left, so you know to teleport.

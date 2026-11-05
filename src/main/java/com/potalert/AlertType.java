@@ -49,9 +49,13 @@ public enum AlertType
 		ItemID.IMBUED_HEART, new int[0],
 		"imbued heart", "saturated heart"),
 
-	OVERLOAD("overload", "Overload", Kind.TIMED, new Skill[0], new Color(0x4A4A4A), AlertSound.DRINK,
+	OVERLOAD("overload", "Overload", Kind.TIMED, new Skill[0], new Color(0x4A4A4A), AlertSound.EXPLODING_VIAL,
 		ItemID.NZONE4DOSEOVERLOADPOTION, new int[0],
 		"overload"),
+
+	ABSORPTION("absorption", "Absorption", Kind.ABSORB, new Skill[0], new Color(0xB8C4D0), AlertSound.SHIELD_HIT,
+		ItemID.NZONE4DOSEABSORPTIONPOTION, new int[0],
+		"absorption ("),
 
 	SALTS("salts", "Smelling salts", Kind.TIMED, new Skill[0], new Color(0xD8C27A), AlertSound.SALT,
 		ItemID.TOA_SUPPLY_STATS_2, new int[0],
@@ -107,7 +111,7 @@ public enum AlertType
 
 	enum Kind
 	{
-		BOOST, SKILL, HEART, TIMED, PRAYER
+		BOOST, SKILL, HEART, TIMED, PRAYER, ABSORB
 	}
 
 	private final String key;
@@ -134,6 +138,7 @@ public enum AlertType
 		this.keywords = keywords;
 	}
 
+	// Names that contain a keyword but aren't drinkable pots
 	private static final String[] EXCLUDED = {"(unf)", "cat antipoison", "potion set", "sigil of"};
 
 	public boolean matches(String lowerName)
