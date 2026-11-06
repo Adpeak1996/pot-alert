@@ -1,36 +1,35 @@
 # Pot Alert
 
-Your screen edge glows in the color of the potion you need, with a sound, when it's time to sip. Great for slayer, bossing and raids, especially when you're not watching your stats closely.
+When a pot is about to run out, your screen edges glow in that pot's color and it plays a sound, so you know what to drink without looking at your stats.
 
 ### How it works
 
-- **One warning, then quiet.** The glow fades after a few seconds, or as soon as you sip.
-- **Resets when you drink.** Once your stat, timer or prayer goes back up, it's ready to warn you again next time it runs low.
-- **Only pots in your inventory**, and only boosts you've actually drunk, so a pot you're saving for later stays quiet.
-- **Quiet at the bank and Grand Exchange**, and when monsters hit you while you're running past.
+- It warns you once and then goes quiet. The glow fades after a few seconds or as soon as you sip.
+- Once you drink and you're back up, it's ready to warn you again next time.
+- It only cares about pots you actually have in your inventory, and boosts you've actually drunk.
+- The pot you need also gets outlined in your inventory.
 
-### What it watches
+### What it covers
 
-- **Combat boosts** at your *Resip at level*: Attack, Strength, Defence, Super combat, Ranging, Bastion, Magic, Battlemage, Zamorak brew and Armadyl brew, including divine, mixes and raid versions
-- **Skilling boosts** at your *Resip at level*: Fishing, Hunter and Agility, including super versions
-- **Timed pots** before they run out: Divines, Overload, Smelling salts, Anti-venom, Antifire, Prayer regeneration, Prayer enhance, Liquid adrenaline, Menaphite remedy, Stamina and Goading
-- **Prayer** at your *Alert at prayer*: Prayer pots, super restores, sanfew, revitalisation, Tears of Elidinis and Blessed crystal scarab
-- **Absorption** at your *Alert at absorption*: NMZ absorption potions. It only starts watching once you've drunk above that number, so starting a dream won't set it off
-- **Imbued and saturated heart** when the heart is ready and your Magic is low
+- Combat boosts: attack, strength, defence, super combat, ranging, bastion, magic, battlemage, zamorak brew and armadyl brew, including divines, mixes and raid versions. Warns at your Resip at level.
+- Skilling boosts: fishing, hunter and agility. Warns at your Resip at level.
+- Timed pots: divines, overload, smelling salts, anti-venom, antifire, prayer regen, prayer enhance, liquid adrenaline, menaphite remedy, stamina and goading. Warns before they run out.
+- Prayer: prayer pots, super restores, sanfew, revitalisation, tears of elidinis and blessed crystal scarabs. Warns at your Alert at prayer.
+- Absorption: warns at your Alert at absorption. It only starts watching once you've drunk above that, so starting a dream won't set it off.
+- Imbued and saturated heart: warns when it's ready and your magic is low.
 
-Anti-venom and antifire also warn once when they run out, even if you have none left, so you know to teleport.
+Anti-venom and antifire also warn once when they actually run out, even if you're out of pots, so you know to tele.
 
-### Handy settings
+### Settings worth knowing
 
-- **Remind again every**: set this if you want repeat warnings. 0 means one warning only.
-- **Match my weapon** (off by default): combat boosts only warn for the style you're holding. The others wait and warn when you swap to that weapon.
-- **Brighten dark potions** (on by default): lightens dark colors like anti-venom and overload so the glow stands out.
-- **Only in combat**: only warn while you're fighting. Skilling pots still warn.
-- **Sounds**: each pot has its own fitting sound out of the box, like a snake hiss for anti-venom and dragon breath for antifire. Pick any other sound, or **Off** for glow only. Set **Volume** to 0 to mute them all.
-- **Colors**: the glow uses the pot's real color, or one you pick.
+- Remind again every: turn this on if you want repeat warnings. 0 means one warning only.
+- Match my weapon (off by default): combat boosts only warn for the style you're using. The rest wait until you swap.
+- Brighten dark potions (on by default): makes dark pots like anti-venom and overload easier to see.
+- Highlight pot in inventory (on by default): outlines the pot you need.
+- Only in combat: only warns while you're fighting. Skilling pots still warn.
+- Every pot has its own sound, like a snake hiss for anti-venom and dragon breath for antifire. You can pick a different one, use your own .wav, or turn it off for glow only. Volume 0 mutes everything.
+- The glow uses the pot's actual color, or you can pick your own.
 
-### Sidebar tab
+There's also a Pot Alert tab in the sidebar where you can test any pot's warning and add your own sounds.
 
-- **Test** any pot's warning to see and hear it
-- **Add** your own `.wav` sounds and pick one for any pot
-- A short guide and a reset button
+Found a bug or have an idea? Hit Report an issue at the top of this page.

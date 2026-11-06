@@ -119,6 +119,13 @@ public interface PotAlertConfig extends Config
 		return 1500;
 	}
 
+	@ConfigItem(keyName = "highlightInventory", name = "Highlight pot in inventory",
+		description = "Outlines the pot you need in your inventory, in the same color, while the glow is up", section = glowSection, position = 4)
+	default boolean highlightInventory()
+	{{
+		return true;
+	}}
+
 	@ConfigSection(name = "Attack", description = "Super attack, divine super attack, attack pots", position = 2, closedByDefault = true)
 	String attackSection = "attack";
 

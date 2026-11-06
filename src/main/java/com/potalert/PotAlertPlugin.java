@@ -102,6 +102,9 @@ public class PotAlertPlugin extends Plugin
 	private EdgeGlowOverlay overlay;
 
 	@Inject
+	private InventoryHighlightOverlay inventoryOverlay;
+
+	@Inject
 	private ItemManager itemManager;
 
 	@Inject
@@ -137,6 +140,8 @@ public class PotAlertPlugin extends Plugin
 
 	/** Colors of the alerts currently up, read by the overlay. */
 	private volatile List<Color> activeColors = Collections.emptyList();
+	private volatile Map<Integer, Color> activeHighlights = Collections.emptyMap();
+	private volatile long glowStart;
 
 	// Test button state
 	private volatile Color previewColor;
@@ -158,6 +163,8 @@ public class PotAlertPlugin extends Plugin
 		boolean expiryPending;
 		/** A warning is waiting for you to swap to the matching weapon */
 		boolean heldForWeapon;
+		int lastDivineValue;
+		int divineChangeTick;
 		/** A divine was running last tick */
 		boolean divineRunning;
 		/** Don't re-arm before this tick, so a divine ending doesn't warn twice */
@@ -203,6 +210,7 @@ public class PotAlertPlugin extends Plugin
 		}
 		clearMissingCustomSounds();
 		overlayManager.add(overlay);
+		overlayManager.add(inventoryOverlay);
 
 		BufferedImage icon = ImageUtil.loadImageResource(PotAlertPlugin.class, "panel_icon.png");
 		navButton = NavigationButton.builder()
@@ -218,6 +226,7 @@ public class PotAlertPlugin extends Plugin
 	protected void shutDown()
 	{
 		overlayManager.remove(overlay);
+		overlayManager.remove(inventoryOverlay);
 		clientToolbar.removeNavigation(navButton);
 		states.clear();
 		activeColors = Collections.emptyList();
@@ -245,6 +254,7 @@ public class PotAlertPlugin extends Plugin
 			states.put(type, new AlertState(type));
 		}
 		activeColors = Collections.emptyList();
+		activeHighlights = Collections.emptyMap();
 		nextPoisonTick = -1;
 		nextAntifireTick = -1;
 		nextSuperAntifireTick = -1;
@@ -258,6 +268,31 @@ public class PotAlertPlugin extends Plugin
 	}
 
 	/** What the overlay should draw right now: a test alert if one is running, otherwise the real alerts. */
+	Map<Integer, Color> getHighlights()
+	{
+		return activeHighlights;
+	}
+
+	/**
+	 * How bright the pulse is right now, from 0.25 to 1. It's timed from the latest warning,
+	 * so a new warning starts at full brightness instead of wherever the pulse happened to be.
+	 */
+	double glowStrength()
+	{
+		int period = Math.max(200, config.pulseSpeed());
+		long since = Math.max(0, System.currentTimeMillis() - glowStart);
+		double phase = ((since + period / 2) % period) / (double) period;
+		double pulse = 0.5 - 0.5 * Math.cos(2 * Math.PI * phase);
+		return 0.25 + 0.75 * pulse;
+	}
+
+	/** Which pulse we're on since the latest warning, used to take turns between colors */
+	long pulseCount()
+	{
+		int period = Math.max(200, config.pulseSpeed());
+		return Math.max(0, System.currentTimeMillis() - glowStart) / period;
+	}
+
 	List<Color> getDisplayColors()
 	{
 		Color preview = previewColor;
@@ -312,6 +347,7 @@ public class PotAlertPlugin extends Plugin
 	{
 		previewColor = color;
 		previewUntil = System.currentTimeMillis() + PREVIEW_MILLIS;
+		glowStart = System.currentTimeMillis();
 		playSound(type);
 	}
 
@@ -521,6 +557,7 @@ public class PotAlertPlugin extends Plugin
 		List<Color> colors = new ArrayList<>();
 		Set<Integer> soundedPots = new HashSet<>();
 		Set<Integer> glowingPots = new HashSet<>();
+		Map<AlertType, Color> glowingTypes = new EnumMap<>(AlertType.class);
 		for (AlertType type : AlertType.values())
 		{
 			AlertState state = states.get(type);
@@ -574,6 +611,7 @@ public class PotAlertPlugin extends Plugin
 				else
 				{
 					state.firedTick = tick;
+					glowStart = System.currentTimeMillis();
 					state.firedForExpiry = expiry && !needs;
 					if (soundedPots.add(potId))
 					{
@@ -587,10 +625,45 @@ public class PotAlertPlugin extends Plugin
 			if (glowing && glowingPots.add(potId))
 			{
 				int colorId = type == AlertType.PRAYER ? type.getSampleItemId() : potId;
-				colors.add(resolveColor(type, colorId));
+				Color color = resolveColor(type, colorId);
+				colors.add(color);
+				glowingTypes.put(type, color);
 			}
 		}
 		activeColors = colors;
+		activeHighlights = findHighlights(glowingTypes);
+	}
+
+	/** Every inventory slot holding a pot that's glowing right now, so the overlay can outline them all, not just one dose */
+	private Map<Integer, Color> findHighlights(Map<AlertType, Color> glowingTypes)
+	{
+		if (glowingTypes.isEmpty() || !config.highlightInventory())
+		{
+			return Collections.emptyMap();
+		}
+		ItemContainer inv = client.getItemContainer(InventoryID.INV);
+		if (inv == null)
+		{
+			return Collections.emptyMap();
+		}
+		Map<Integer, Color> found = new HashMap<>();
+		for (Item item : inv.getItems())
+		{
+			if (item.getId() <= 0 || found.containsKey(item.getId()))
+			{
+				continue;
+			}
+			String name = client.getItemDefinition(item.getId()).getName().toLowerCase();
+			for (Map.Entry<AlertType, Color> e : glowingTypes.entrySet())
+			{
+				if (e.getKey().matches(name))
+				{
+					found.put(item.getId(), e.getValue());
+					break;
+				}
+			}
+		}
+		return found;
 	}
 
 	// Checks
@@ -656,7 +729,15 @@ public class PotAlertPlugin extends Plugin
 					state.noArmUntil = tick + 5;
 				}
 				state.divineRunning = divineLeft > 0;
-				boolean divineEnding = divineLeft > 0 && divineLeft <= warnTicks;
+
+				// The game can be a tick or two late updating this, so also count down ourselves and use whichever is sooner
+				if (divineLeft != state.lastDivineValue)
+				{
+					state.lastDivineValue = divineLeft;
+					state.divineChangeTick = tick;
+				}
+				int divineSoon = divineLeft > 0 ? Math.max(1, Math.min(divineLeft, divineLeft - (tick - state.divineChangeTick))) : 0;
+				boolean divineEnding = divineSoon > 0 && divineSoon <= warnTicks;
 				return statIsLow(type) || divineEnding;
 			}
 		}

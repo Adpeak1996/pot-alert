@@ -39,10 +39,10 @@ class PotAlertPanel extends PluginPanel
 
 	private static final String INTRO = OPEN
 		+ "<font size='+1' color='#ff981f'><b>Pot Alert</b></font><br>"
-		+ "Your screen glows in the pot's color with a sound when it's time to sip.<br><br>"
+		+ "Your screen glows in the pot's color with a sound when it's time to drink.<br><br>"
 		+ "<font color='#ff981f'><b>How it works</b></font><br>"
-		+ "&bull; One warning, then it goes quiet<br>"
-		+ "&bull; After you drink, it's ready to warn you again<br>"
+		+ "&bull; Warns once, then goes quiet<br>"
+		+ "&bull; Ready again once you drink<br>"
 		+ "&bull; Only pots in your inventory<br>"
 		+ "&bull; Only boosts you've actually drunk"
 		+ CLOSE;
@@ -59,18 +59,18 @@ class PotAlertPanel extends PluginPanel
 
 	private static final String REFERENCE = OPEN
 		+ "<font color='#ff981f'><b>When it warns</b></font><br>"
-		+ "<b>Boosts and skilling pots:</b> at your <i>Resip at level</i><br>"
+		+ "<b>Boosts:</b> at your <i>Resip at level</i><br>"
 		+ "<b>Timed pots:</b> before they run out<br>"
 		+ "<b>Prayer:</b> at your <i>Alert at prayer</i><br>"
 		+ "<b>Absorption:</b> at your <i>Alert at absorption</i>, once you've drunk above it<br>"
-		+ "<b>Anti-venom, antifire:</b> before they run out, and once more when they do<br><br>"
+		+ "<b>Anti-venom, antifire:</b> before they run out, and again when they do<br><br>"
 		+ "<font color='#ff981f'><b>Tips</b></font><br>"
-		+ "&bull; Want repeats? Set <i>Remind again every</i>. 0 means one warning only<br>"
-		+ "&bull; Sound <i>Off</i> = glow only for that pot. <i>Volume</i> 0 mutes them all<br>"
-		+ "&bull; <i>Brighten dark potions</i> (on by default) lightens dark colors like anti-venom so the glow is easy to see<br>"
-		+ "&bull; Quiet at the bank and GE<br>"
-		+ "&bull; Fishing, Hunter and Agility pots warn even with <i>Only in combat</i> on<br>"
-		+ "&bull; <i>Match my weapon</i> (off by default) only warns for the style you're holding. Other boosts wait until you swap<br>"
+		+ "&bull; Want repeats? Set <i>Remind again every</i>. 0 is one warning only<br>"
+		+ "&bull; Sound <i>Off</i> is glow only for that pot. <i>Volume</i> 0 mutes everything<br>"
+		+ "&bull; <i>Brighten dark potions</i> (on by default) makes dark pots easier to see<br>"
+		+ "&bull; <i>Highlight pot in inventory</i> (on by default) outlines the pot you need<br>"
+		+ "&bull; <i>Match my weapon</i> (off by default) only warns for the style you're using<br>"
+		+ "&bull; Skilling pots still warn with <i>Only in combat</i> on<br>"
 		+ "&bull; Raid pots count as their normal versions"
 		+ CLOSE;
 

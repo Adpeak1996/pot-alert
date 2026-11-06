@@ -38,14 +38,9 @@ class EdgeGlowOverlay extends Overlay
 			return null;
 		}
 
-		long now = System.currentTimeMillis();
-		int period = Math.max(200, config.pulseSpeed());
 		// With more than one alert up, the colors take turns, one per pulse
-		Color base = colors.get((int) ((now / period) % colors.size()));
-
-		double phase = (now % period) / (double) period;
-		double pulse = 0.5 - 0.5 * Math.cos(2 * Math.PI * phase);
-		int alpha = (int) (config.glowOpacity() * 2.55 * (0.25 + 0.75 * pulse));
+		Color base = colors.get((int) (plugin.pulseCount() % colors.size()));
+		int alpha = (int) (config.glowOpacity() * 2.55 * plugin.glowStrength());
 
 		int x = client.getViewportXOffset();
 		int y = client.getViewportYOffset();
