@@ -2,6 +2,8 @@
 
 When a pot is about to run out, your screen edges glow in that pot's color and it plays a sound, so you know what to drink without looking at your stats.
 
+![Pot Alert demo](https://raw.githubusercontent.com/Adpeak1996/pot-alert/main/demo.gif)
+
 ### How it works
 
 - It warns you once and then goes quiet. The glow fades after a few seconds or as soon as you sip.
