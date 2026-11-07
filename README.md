@@ -25,6 +25,7 @@ Anti-venom and antifire also warn once when they actually run out, even if you'r
 ### Settings worth knowing
 
 - Remind again every: turn this on if you want repeat warnings. 0 means one warning only.
+- Wait after big stat drop (6 seconds by default): after a brew or nectar knocks your boosts down, it gives you a few seconds to repot before warning. 0 turns it off.
 - Match my weapon (off by default): combat boosts only warn for the style you're using. The rest wait until you swap.
 - Brighten dark potions (on by default): makes dark pots like anti-venom and overload easier to see.
 - Highlight pot in inventory (on by default): outlines the pot you need. Outline thickness goes from 1 (thin) to 3 (extra bold).

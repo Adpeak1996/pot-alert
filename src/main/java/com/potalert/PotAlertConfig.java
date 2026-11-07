@@ -55,10 +55,19 @@ public interface PotAlertConfig extends Config
 		return 15;
 	}
 
+	@Range(max = 30)
+	@Units(Units.SECONDS)
+	@ConfigItem(keyName = "dropWait", name = "Wait after big stat drop",
+		description = "After a brew or nectar knocks your boosts down, wait this long before warning so you have time to repot. 0 turns it off", section = generalSection, position = 5)
+	default int dropWait()
+	{
+		return 6;
+	}
+
 	@Range(min = 1, max = 60)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "alertDuration", name = "Warning glow",
-		description = "How long the screen glows for each warning. It stops early once you sip", section = generalSection, position = 5)
+		description = "How long the screen glows for each warning. It stops early once you sip", section = generalSection, position = 6)
 	default int alertDuration()
 	{
 		return 8;
@@ -67,7 +76,7 @@ public interface PotAlertConfig extends Config
 	@Range(min = 0, max = 300)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "remindEvery", name = "Remind again every",
-		description = "How often to repeat the warning until you drink. Leave at 0 for just one warning", section = generalSection, position = 6)
+		description = "How often to repeat the warning until you drink. Leave at 0 for just one warning", section = generalSection, position = 7)
 	default int remindEvery()
 	{
 		return 0;
@@ -76,7 +85,7 @@ public interface PotAlertConfig extends Config
 	@Range(min = 0, max = 100)
 	@Units(Units.PERCENT)
 	@ConfigItem(keyName = "volume", name = "Volume",
-		description = "Alert volume. Plays even if your in-game sound effects are muted. Set to 0 to mute all sounds (glow only)", section = generalSection, position = 7)
+		description = "Alert volume. Plays even if your in-game sound effects are muted. Set to 0 to mute all sounds (glow only)", section = generalSection, position = 8)
 	default int volume()
 	{
 		return 50;

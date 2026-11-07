@@ -69,6 +69,7 @@ class PotAlertPanel extends PluginPanel
 		+ "&bull; Sound <i>Off</i> is glow only for that pot. <i>Volume</i> 0 mutes everything<br>"
 		+ "&bull; <i>Brighten dark potions</i> (on by default) makes dark pots easier to see<br>"
 		+ "&bull; <i>Highlight pot in inventory</i> (on by default) outlines the pot you need. <i>Outline thickness</i> makes it thinner or bolder<br>"
+		+ "&bull; After a brew or nectar, boosts wait a few seconds so you can repot. Change it with <i>Wait after big stat drop</i><br>"
 		+ "&bull; <i>Match my weapon</i> (off by default) only warns for the style you're using<br>"
 		+ "&bull; Skilling pots still warn with <i>Only in combat</i> on<br>"
 		+ "&bull; Raid pots count as their normal versions"

@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -123,6 +124,13 @@ public class PotAlertPlugin extends Plugin
 	private int nextAntifireTick = -1;
 	private int nextSuperAntifireTick = -1;
 	private int nextOverloadTick = -1;
+
+	/** Skills a brew or nectar knocks down */
+	private static final Skill[] BREWED_SKILLS = {Skill.ATTACK, Skill.STRENGTH, Skill.DEFENCE, Skill.RANGED, Skill.MAGIC};
+	private static final Set<AlertType.Kind> BOOST_KINDS = EnumSet.of(AlertType.Kind.BOOST, AlertType.Kind.HEART);
+	private final Map<Skill, Integer> lastBoosted = new EnumMap<>(Skill.class);
+	/** Boost warnings wait until this tick after a big stat drop */
+	private int dropWaitUntil = -1;
 	/** Timers the game only updates in chunks, by varbit: ticks per chunk */
 	private static final Map<Integer, Integer> CHUNKED_TIMERS = Map.of(
 		VarbitID.TOA_MIDRAIDLOOT_STATS_TIMER, 25,
@@ -260,6 +268,8 @@ public class PotAlertPlugin extends Plugin
 		nextSuperAntifireTick = -1;
 		nextOverloadTick = -1;
 		nextChunkTick.clear();
+		lastBoosted.clear();
+		dropWaitUntil = -1;
 		lastChunkValue.clear();
 		venomPhase = false;
 		enhanceEndTick = -1;
@@ -553,6 +563,7 @@ public class PotAlertPlugin extends Plugin
 			|| isOpen(InterfaceID.GeOffers.UNIVERSE);
 		Map<AlertType, Integer> pots = findPots();
 		Style holding = config.matchWeapon() ? currentStyle() : Style.ANY;
+		boolean dropWait = checkStatDrops(tick);
 
 		List<Color> colors = new ArrayList<>();
 		Set<Integer> soundedPots = new HashSet<>();
@@ -600,7 +611,10 @@ public class PotAlertPlugin extends Plugin
 			boolean styleOk = holding == Style.ANY || styleFor(type) == Style.ANY || styleFor(type) == holding;
 			state.heldForWeapon = state.armed && needs && !styleOk;
 
-			if ((trigger || remind) && (combatOk || type.getKind() == AlertType.Kind.SKILL) && styleOk && !heldForLogin)
+			// Right after a brew, give you a few seconds to repot before warning about the boost it knocked down
+			boolean dropOk = !dropWait || !BOOST_KINDS.contains(type.getKind());
+
+			if ((trigger || remind) && (combatOk || type.getKind() == AlertType.Kind.SKILL) && styleOk && dropOk && !heldForLogin)
 			{
 				state.armed = false;
 				state.expiryPending = false;
@@ -767,6 +781,25 @@ public class PotAlertPlugin extends Plugin
 			default:
 				return Style.ANY;
 		}
+	}
+
+	/**
+	 * Boosts wear off 1 level at a time, so a drop of 2 or more in one tick means a brew, nectar or something
+	 * draining you. Returns true while we're still giving you time to repot after one.
+	 */
+	private boolean checkStatDrops(int tick)
+	{
+		int waitTicks = secondsToTicks(config.dropWait());
+		for (Skill skill : BREWED_SKILLS)
+		{
+			int now = client.getBoostedSkillLevel(skill);
+			Integer before = lastBoosted.put(skill, now);
+			if (before != null && before - now >= 2 && waitTicks > 0)
+			{
+				dropWaitUntil = tick + waitTicks;
+			}
+		}
+		return tick < dropWaitUntil;
 	}
 
 	/** Reads your attack style the same way RuneLite's Attack Styles plugin does */
