@@ -122,9 +122,17 @@ public interface PotAlertConfig extends Config
 	@ConfigItem(keyName = "highlightInventory", name = "Highlight pot in inventory",
 		description = "Outlines the pot you need in your inventory, in the same color, while the glow is up", section = glowSection, position = 4)
 	default boolean highlightInventory()
-	{{
+	{
 		return true;
-	}}
+	}
+
+	@Range(min = 1, max = 3)
+	@ConfigItem(keyName = "outlineThickness", name = "Outline thickness",
+		description = "How thick the inventory outline is. 1 is thin, 3 is extra bold", section = glowSection, position = 5)
+	default int outlineThickness()
+	{
+		return 2;
+	}
 
 	@ConfigSection(name = "Attack", description = "Super attack, divine super attack, attack pots", position = 2, closedByDefault = true)
 	String attackSection = "attack";

@@ -2,7 +2,7 @@
 
 When a pot is about to run out, your screen edges glow in that pot's color and it plays a sound, so you know what to drink without looking at your stats.
 
-![Pot Alert demo](https://raw.githubusercontent.com/Adpeak1996/pot-alert/main/demo.gif)
+![Pot Alert demo](https://raw.githubusercontent.com/Adpeak1996/pot-alert/main/demo.webp)
 
 ### How it works
 
@@ -27,7 +27,7 @@ Anti-venom and antifire also warn once when they actually run out, even if you'r
 - Remind again every: turn this on if you want repeat warnings. 0 means one warning only.
 - Match my weapon (off by default): combat boosts only warn for the style you're using. The rest wait until you swap.
 - Brighten dark potions (on by default): makes dark pots like anti-venom and overload easier to see.
-- Highlight pot in inventory (on by default): outlines the pot you need.
+- Highlight pot in inventory (on by default): outlines the pot you need. Outline thickness goes from 1 (thin) to 3 (extra bold).
 - Only in combat: only warns while you're fighting. Skilling pots still warn.
 - Every pot has its own sound, like a snake hiss for anti-venom and dragon breath for antifire. You can pick a different one, use your own .wav, or turn it off for glow only. Volume 0 mutes everything.
 - The glow uses the pot's actual color, or you can pick your own.

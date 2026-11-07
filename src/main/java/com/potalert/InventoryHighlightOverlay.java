@@ -13,12 +13,14 @@ import net.runelite.client.ui.overlay.WidgetItemOverlay;
 class InventoryHighlightOverlay extends WidgetItemOverlay
 {
 	private final PotAlertPlugin plugin;
+	private final PotAlertConfig config;
 	private final ItemManager itemManager;
 
 	@Inject
-	InventoryHighlightOverlay(PotAlertPlugin plugin, ItemManager itemManager)
+	InventoryHighlightOverlay(PotAlertPlugin plugin, PotAlertConfig config, ItemManager itemManager)
 	{
 		this.plugin = plugin;
+		this.config = config;
 		this.itemManager = itemManager;
 		showOnInventory();
 	}
@@ -41,11 +43,15 @@ class InventoryHighlightOverlay extends WidgetItemOverlay
 		int x = (int) bounds.getX();
 		int y = (int) bounds.getY();
 
-		// Drawn a pixel off in each direction to make the line thicker
-		g.drawImage(image, x - 1, y, null);
-		g.drawImage(image, x + 1, y, null);
-		g.drawImage(image, x, y - 1, null);
-		g.drawImage(image, x, y + 1, null);
+		// Thicker outlines are the same outline drawn shifted a pixel or two in each direction
+		int spread = Math.max(1, Math.min(3, config.outlineThickness())) - 1;
+		for (int d = 1; d <= spread; d++)
+		{
+			g.drawImage(image, x - d, y, null);
+			g.drawImage(image, x + d, y, null);
+			g.drawImage(image, x, y - d, null);
+			g.drawImage(image, x, y + d, null);
+		}
 		g.drawImage(image, x, y, null);
 	}
 
