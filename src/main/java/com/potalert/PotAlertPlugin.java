@@ -71,6 +71,10 @@ public class PotAlertPlugin extends Plugin
 	// Poison varp: negative = immunity. Below -38 is anti-venom, -38 to -1 is antipoison only.
 	private static final int VENOM_VALUE_CUTOFF = -38;
 	private static final int POISON_TICK_LENGTH = 30;
+	/** Repeat reminders stop after this many, so a forgotten pot doesn't nag forever */
+	private static final int MAX_REMINDERS = 5;
+	/** Spec energy (out of 1000) at or below which a surge dose isn't wasted */
+	private static final int SURGE_SPEC_LEVEL = 750;
 	private static final int ANTIFIRE_TICK_LENGTH = 30;
 	private static final int SUPER_ANTIFIRE_TICK_LENGTH = 20;
 	private static final int OVERLOAD_TICK_LENGTH = 25;
@@ -129,6 +133,8 @@ public class PotAlertPlugin extends Plugin
 	private static final Skill[] BREWED_SKILLS = {Skill.ATTACK, Skill.STRENGTH, Skill.DEFENCE, Skill.RANGED, Skill.MAGIC};
 	private static final Set<AlertType.Kind> BOOST_KINDS = EnumSet.of(AlertType.Kind.BOOST, AlertType.Kind.HEART);
 	private final Map<Skill, Integer> lastBoosted = new EnumMap<>(Skill.class);
+	private final Map<Integer, Integer> lastDivineTimers = new HashMap<>();
+	private int divineEndTick = -1;
 	/** Boost warnings wait until this tick after a big stat drop */
 	private int dropWaitUntil = -1;
 	/** Timers the game only updates in chunks, by varbit: ticks per chunk */
@@ -141,7 +147,20 @@ public class PotAlertPlugin extends Plugin
 	/** When each chunked timer next ticks down, so we can count the ticks in between */
 	private final Map<Integer, Integer> nextChunkTick = new HashMap<>();
 	private final Map<Integer, Integer> lastChunkValue = new HashMap<>();
-	private boolean venomPhase;
+	private enum PoisonDrink
+	{
+		UNKNOWN, ANTI_VENOM, ANTIPOISON
+	}
+
+	/**
+	 * What you last drank for poison. Kept through world hops on purpose, so the leftover
+	 * antipoison part of an anti-venom doesn't get mistaken for a fresh antipoison.
+	 */
+	private PoisonDrink lastPoisonDrink = PoisonDrink.UNKNOWN;
+	/** Anti-venom is what's protecting you, so only anti-venoms count as a pot for it */
+	private boolean venomOnly;
+	/** Boost types you're carrying a divine for */
+	private final Set<AlertType> divinesCarried = EnumSet.noneOf(AlertType.class);
 	private boolean waitingForFirstFight = true;
 	private int enhanceEndTick = -1;
 	private int adrenalineEndTick = -1;
@@ -169,14 +188,10 @@ public class PotAlertPlugin extends Plugin
 		boolean timerSeen;
 		/** Anti-venom or antifire just ran out, warn once */
 		boolean expiryPending;
-		/** A warning is waiting for you to swap to the matching weapon */
-		boolean heldForWeapon;
+		/** Reminders played since the first warning. They stop after MAX_REMINDERS */
+		int reminders;
 		int lastDivineValue;
 		int divineChangeTick;
-		/** A divine was running last tick */
-		boolean divineRunning;
-		/** Don't re-arm before this tick, so a divine ending doesn't warn twice */
-		int noArmUntil;
 
 		AlertState(AlertType type)
 		{
@@ -269,9 +284,10 @@ public class PotAlertPlugin extends Plugin
 		nextOverloadTick = -1;
 		nextChunkTick.clear();
 		lastBoosted.clear();
+		lastDivineTimers.clear();
+		divineEndTick = -1;
 		dropWaitUntil = -1;
 		lastChunkValue.clear();
-		venomPhase = false;
 		enhanceEndTick = -1;
 		adrenalineEndTick = -1;
 		waitingForFirstFight = true;
@@ -458,6 +474,16 @@ public class PotAlertPlugin extends Plugin
 		if (message.startsWith("You drink some of"))
 		{
 			waitingForFirstFight = false;
+
+			String lower = message.toLowerCase();
+			if (lower.contains("anti-venom") || lower.contains("antivenom"))
+			{
+				lastPoisonDrink = PoisonDrink.ANTI_VENOM;
+			}
+			else if (lower.contains("antipoison") || lower.contains("antidote") || lower.contains("sanfew"))
+			{
+				lastPoisonDrink = PoisonDrink.ANTIPOISON;
+			}
 		}
 		if (message.startsWith("You drink some of your") && message.contains("prayer enhance"))
 		{
@@ -561,6 +587,8 @@ public class PotAlertPlugin extends Plugin
 		int remindTicks = secondsToTicks(config.remindEvery());
 		boolean banking = isOpen(InterfaceID.Bankmain.UNIVERSE) || isOpen(InterfaceID.BankDepositbox.UNIVERSE)
 			|| isOpen(InterfaceID.GeOffers.UNIVERSE);
+		// After an anti-venom only another anti-venom helps, so a sanfew or antipoison doesn't count
+		venomOnly = lastPoisonDrink == PoisonDrink.ANTI_VENOM && client.getVarpValue(VarPlayerID.POISON) <= 0;
 		Map<AlertType, Integer> pots = findPots();
 		Style holding = config.matchWeapon() ? currentStyle() : Style.ANY;
 		boolean dropWait = checkStatDrops(tick);
@@ -581,7 +609,7 @@ public class PotAlertPlugin extends Plugin
 			// One warning per drain: a pot fires once, then re-arms after you drink and it's no longer low
 			boolean needs = needsSip(type, state, warnTicks, tick);
 			boolean expiry = state.expiryPending;
-			if (!needs && !expiry && tick >= state.noArmUntil)
+			if (!needs && !expiry)
 			{
 				state.armed = true;
 			}
@@ -605,17 +633,18 @@ public class PotAlertPlugin extends Plugin
 			boolean heldForLogin = waitingForFirstFight && !state.timerSeen
 				&& (type.getKind() != AlertType.Kind.PRAYER || !config.prayerOnLogin());
 			boolean trigger = (state.armed && needs) || expiry;
-			boolean remind = remindTicks > 0 && needs && state.firedTick >= 0 && tick - state.firedTick >= remindTicks;
+			boolean remind = remindTicks > 0 && needs && state.firedTick >= 0 && tick - state.firedTick >= remindTicks
+				&& state.reminders < MAX_REMINDERS;
 
 			// With Match my weapon on, a boost for another style waits here until you swap
 			boolean styleOk = holding == Style.ANY || styleFor(type) == Style.ANY || styleFor(type) == holding;
-			state.heldForWeapon = state.armed && needs && !styleOk;
 
 			// Right after a brew, give you a few seconds to repot before warning about the boost it knocked down
 			boolean dropOk = !dropWait || !BOOST_KINDS.contains(type.getKind());
 
 			if ((trigger || remind) && (combatOk || type.getKind() == AlertType.Kind.SKILL) && styleOk && dropOk && !heldForLogin)
 			{
+				state.reminders = trigger ? 0 : state.reminders + 1;
 				state.armed = false;
 				state.expiryPending = false;
 				if (banking)
@@ -670,7 +699,7 @@ public class PotAlertPlugin extends Plugin
 			String name = client.getItemDefinition(item.getId()).getName().toLowerCase();
 			for (Map.Entry<AlertType, Color> e : glowingTypes.entrySet())
 			{
-				if (e.getKey().matches(name))
+				if (isPotFor(e.getKey(), name))
 				{
 					found.put(item.getId(), e.getValue());
 					break;
@@ -692,6 +721,12 @@ public class PotAlertPlugin extends Plugin
 			case HEART:
 				return client.getVarbitValue(VarbitID.IMBUED_HEART_TIMER) == 0 && statIsLow(type);
 
+			case SURGE:
+				// No buff to run out, just a 5 minute cooldown. Warn once it's ready again and your spec
+				// is low enough that a dose (25%) won't go to waste
+				return client.getVarbitValue(VarbitID.SURGE_POTION_TIMER) == 0
+					&& client.getVarpValue(VarPlayerID.SA_ENERGY) <= SURGE_SPEC_LEVEL;
+
 			case ABSORB:
 			{
 				int points = client.getVarbitValue(VarbitID.NZONE_ABSORB_POTION_EFFECTS);
@@ -709,7 +744,6 @@ public class PotAlertPlugin extends Plugin
 				int poison = client.getVarpValue(VarPlayerID.POISON);
 				if (type == AlertType.POISON && poison > 0)
 				{
-					venomPhase = false;
 					state.running = false;
 					state.expiryPending = false;
 					return config.poisonWhenPoisoned();
@@ -732,17 +766,14 @@ public class PotAlertPlugin extends Plugin
 
 			default:
 			{
+				// Divines hold your boost until they run out, then your stat drops straight to base.
+				// With another divine on you, warn before it ends so you can chain them with no gap.
+				// With only regular pots, wait until it runs out, since drinking one before that wastes the dose.
 				int divineLeft = 0;
 				for (int varbit : type.getDivineVarbits())
 				{
 					divineLeft = Math.max(divineLeft, client.getVarbitValue(varbit));
 				}
-				if (state.divineRunning && divineLeft == 0 && !state.heldForWeapon)
-				{
-					state.armed = false;
-					state.noArmUntil = tick + 5;
-				}
-				state.divineRunning = divineLeft > 0;
 
 				// The game can be a tick or two late updating this, so also count down ourselves and use whichever is sooner
 				if (divineLeft != state.lastDivineValue)
@@ -751,7 +782,7 @@ public class PotAlertPlugin extends Plugin
 					state.divineChangeTick = tick;
 				}
 				int divineSoon = divineLeft > 0 ? Math.max(1, Math.min(divineLeft, divineLeft - (tick - state.divineChangeTick))) : 0;
-				boolean divineEnding = divineSoon > 0 && divineSoon <= warnTicks;
+				boolean divineEnding = divineSoon > 0 && divineSoon <= warnTicks && divinesCarried.contains(type);
 				return statIsLow(type) || divineEnding;
 			}
 		}
@@ -789,12 +820,28 @@ public class PotAlertPlugin extends Plugin
 	 */
 	private boolean checkStatDrops(int tick)
 	{
+		// A divine running out drops your stats straight to base too, but that's not a brew, so don't wait on it
+		// (give it a couple of ticks either way, in case the stat and the timer don't update on the same tick)
+		for (AlertType type : AlertType.values())
+		{
+			for (int varbit : type.getDivineVarbits())
+			{
+				int now = client.getVarbitValue(varbit);
+				Integer before = lastDivineTimers.put(varbit, now);
+				if (before != null && before > 0 && now <= 2)
+				{
+					divineEndTick = tick;
+				}
+			}
+		}
+		boolean divineJustEnded = divineEndTick >= 0 && tick - divineEndTick <= 2;
+
 		int waitTicks = secondsToTicks(config.dropWait());
 		for (Skill skill : BREWED_SKILLS)
 		{
 			int now = client.getBoostedSkillLevel(skill);
 			Integer before = lastBoosted.put(skill, now);
-			if (before != null && before - now >= 2 && waitTicks > 0)
+			if (before != null && before - now >= 2 && waitTicks > 0 && !divineJustEnded)
 			{
 				dropWaitUntil = tick + waitTicks;
 			}
@@ -917,24 +964,27 @@ public class PotAlertPlugin extends Plugin
 		}
 	}
 
-	/** Ticks of the immunity you care about. Once anti-venom's venom part ends, that counts as expired. */
+	/**
+	 * Ticks of poison protection worth warning about, based on what you last drank.
+	 * Anti-venom protects from venom first, then leaves some antipoison protection behind.
+	 * That leftover isn't worth a warning, so it only counts if you actually drank an antipoison.
+	 */
 	private int poisonRemaining(int value)
 	{
-		if (value == 0)
+		if (value >= 0)
 		{
-			venomPhase = false;
 			return -1;
 		}
 
 		int base = Math.max(0, nextPoisonTick - client.getTickCount());
 		if (value < VENOM_VALUE_CUTOFF)
 		{
-			venomPhase = true;
+			// Still in the venom part, so this is an anti-venom
+			lastPoisonDrink = PoisonDrink.ANTI_VENOM;
 			return base + Math.abs((value + 1 - VENOM_VALUE_CUTOFF) * POISON_TICK_LENGTH);
 		}
-		if (venomPhase)
+		if (lastPoisonDrink != PoisonDrink.ANTIPOISON)
 		{
-			// Venom protection ran out, only poison protection left
 			return -1;
 		}
 		return base + Math.abs((value + 1) * POISON_TICK_LENGTH);
@@ -1008,6 +1058,7 @@ public class PotAlertPlugin extends Plugin
 	private Map<AlertType, Integer> findPots()
 	{
 		Map<AlertType, Integer> found = new EnumMap<>(AlertType.class);
+		divinesCarried.clear();
 		ItemContainer inv = client.getItemContainer(InventoryID.INV);
 		if (inv == null)
 		{
@@ -1023,13 +1074,26 @@ public class PotAlertPlugin extends Plugin
 			String name = client.getItemDefinition(item.getId()).getName().toLowerCase();
 			for (AlertType type : AlertType.values())
 			{
-				if (!found.containsKey(type) && type.matches(name))
+				if (isPotFor(type, name))
 				{
-					found.put(type, item.getId());
+					found.putIfAbsent(type, item.getId());
+					if (name.startsWith("divine"))
+					{
+						divinesCarried.add(type);
+					}
 				}
 			}
 		}
 		return found;
+	}
+
+	private boolean isPotFor(AlertType type, String name)
+	{
+		if (!type.matches(name))
+		{
+			return false;
+		}
+		return type != AlertType.POISON || !venomOnly || name.contains("anti-venom");
 	}
 
 	/** Anti-venom and antifire can warn with none left, so you know to teleport out */
@@ -1076,6 +1140,7 @@ public class PotAlertPlugin extends Plugin
 			case BATTLEMAGE: return config.battlemageEnabled();
 			case ZAMORAK: return config.zamorakEnabled();
 			case HEART: return config.heartEnabled();
+			case SURGE: return config.surgeEnabled();
 			case OVERLOAD: return config.overloadEnabled();
 			case ABSORPTION: return config.absorptionEnabled();
 			case SALTS: return config.saltsEnabled();
@@ -1116,39 +1181,6 @@ public class PotAlertPlugin extends Plugin
 		}
 	}
 
-	private boolean usePotionColor(AlertType type)
-	{
-		switch (type)
-		{
-			case ATTACK: return config.attackUsePotionColor();
-			case STRENGTH: return config.strengthUsePotionColor();
-			case DEFENCE: return config.defenceUsePotionColor();
-			case COMBAT: return config.combatUsePotionColor();
-			case RANGED: return config.rangedUsePotionColor();
-			case BASTION: return config.bastionUsePotionColor();
-			case MAGIC: return config.magicUsePotionColor();
-			case BATTLEMAGE: return config.battlemageUsePotionColor();
-			case ZAMORAK: return config.zamorakUsePotionColor();
-			case HEART: return config.heartUsePotionColor();
-			case OVERLOAD: return config.overloadUsePotionColor();
-			case ABSORPTION: return config.absorptionUsePotionColor();
-			case SALTS: return config.saltsUsePotionColor();
-			case POISON: return config.poisonUsePotionColor();
-			case ANTIFIRE: return config.antifireUsePotionColor();
-			case PRAYER_REGEN: return config.prayerregenUsePotionColor();
-			case ENHANCE: return config.enhanceUsePotionColor();
-			case ADRENALINE: return config.adrenalineUsePotionColor();
-			case REMEDY: return config.remedyUsePotionColor();
-			case STAMINA: return config.staminaUsePotionColor();
-			case GOADING: return config.goadingUsePotionColor();
-			case FISHING: return config.fishingUsePotionColor();
-			case HUNTER: return config.hunterUsePotionColor();
-			case AGILITY: return config.agilityUsePotionColor();
-			case PRAYER: return config.prayerUsePotionColor();
-			default: return true;
-		}
-	}
-
 	private Color configColor(AlertType type)
 	{
 		switch (type)
@@ -1163,6 +1195,7 @@ public class PotAlertPlugin extends Plugin
 			case BATTLEMAGE: return config.battlemageColor();
 			case ZAMORAK: return config.zamorakColor();
 			case HEART: return config.heartColor();
+			case SURGE: return config.surgeColor();
 			case OVERLOAD: return config.overloadColor();
 			case ABSORPTION: return config.absorptionColor();
 			case SALTS: return config.saltsColor();
@@ -1196,6 +1229,7 @@ public class PotAlertPlugin extends Plugin
 			case BATTLEMAGE: return config.battlemageSound();
 			case ZAMORAK: return config.zamorakSound();
 			case HEART: return config.heartSound();
+			case SURGE: return config.surgeSound();
 			case OVERLOAD: return config.overloadSound();
 			case ABSORPTION: return config.absorptionSound();
 			case SALTS: return config.saltsSound();
@@ -1229,6 +1263,7 @@ public class PotAlertPlugin extends Plugin
 			case BATTLEMAGE: return config.battlemageCustomFile();
 			case ZAMORAK: return config.zamorakCustomFile();
 			case HEART: return config.heartCustomFile();
+			case SURGE: return config.surgeCustomFile();
 			case OVERLOAD: return config.overloadCustomFile();
 			case ABSORPTION: return config.absorptionCustomFile();
 			case SALTS: return config.saltsCustomFile();
@@ -1263,7 +1298,7 @@ public class PotAlertPlugin extends Plugin
 
 	private Color loadedColor(AlertType type, int potId)
 	{
-		if (!usePotionColor(type))
+		if (hasCustomColor(type))
 		{
 			return configColor(type);
 		}
@@ -1273,6 +1308,12 @@ public class PotAlertPlugin extends Plugin
 			return null;
 		}
 		return config.brightenDark() ? brighten(sampled) : sampled;
+	}
+
+	/** Left at its default, the Color setting means "use the pot's own color". Anything else is a color you picked */
+	private boolean hasCustomColor(AlertType type)
+	{
+		return !type.getDefaultColor().equals(configColor(type));
 	}
 
 	private void requestColor(int potId)

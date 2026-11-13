@@ -43,6 +43,7 @@ public enum AlertSound
 	SPIDER("Spider", 1279),
 	BOING("Splash boing", 227),
 	STONE_ARMOUR("Stone armour", 31),
+	SURGE_POP("Surge pop", 6182),
 	VWOOP("Teleport", 200),
 	UNLOCK("Unlock", 2419),
 	WHISTLE("Whistle", 1569),

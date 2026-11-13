@@ -24,14 +24,14 @@ public interface PotAlertConfig extends Config
 	}
 
 	@ConfigItem(keyName = "hitsCountAsCombat", name = "Getting hit counts as combat",
-		description = "When off, only your own attacks count, so running past monsters won't set off warnings", section = generalSection, position = 1)
+		description = "When off, only your own attacks count, so running past monsters won't set off warnings", section = advancedSection, position = 0)
 	default boolean hitsCountAsCombat()
 	{
 		return false;
 	}
 
 	@ConfigItem(keyName = "matchWeapon", name = "Match my weapon",
-		description = "Combat boosts only warn for the style you're holding. The others wait and warn when you swap to that weapon", section = generalSection, position = 2)
+		description = "Combat boosts only warn for the style you're holding. The others wait and warn when you swap to that weapon", section = generalSection, position = 1)
 	default boolean matchWeapon()
 	{
 		return false;
@@ -40,7 +40,7 @@ public interface PotAlertConfig extends Config
 	@Range(min = 1, max = 60)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "combatTimeout", name = "Combat timeout",
-		description = "How long after your last attack you still count as in combat", section = generalSection, position = 3)
+		description = "How long after your last attack you still count as in combat", section = advancedSection, position = 1)
 	default int combatTimeout()
 	{
 		return 10;
@@ -49,7 +49,7 @@ public interface PotAlertConfig extends Config
 	@Range(min = 0, max = 120)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "warnSeconds", name = "Warn before expiry",
-		description = "How many seconds before a timed pot runs out to warn you", section = generalSection, position = 4)
+		description = "How many seconds before a timed pot runs out to warn you. Divines only warn early if you have another divine. With regular pots they warn when they run out, since drinking early wastes the dose", section = generalSection, position = 2)
 	default int warnSeconds()
 	{
 		return 15;
@@ -58,7 +58,7 @@ public interface PotAlertConfig extends Config
 	@Range(max = 30)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "dropWait", name = "Wait after big stat drop",
-		description = "After a brew or nectar knocks your boosts down, wait this long before warning so you have time to repot. 0 turns it off", section = generalSection, position = 5)
+		description = "After a brew or nectar knocks your boosts down, wait this long before warning so you have time to repot. 0 turns it off", section = advancedSection, position = 2)
 	default int dropWait()
 	{
 		return 6;
@@ -67,7 +67,7 @@ public interface PotAlertConfig extends Config
 	@Range(min = 1, max = 60)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "alertDuration", name = "Warning glow",
-		description = "How long the screen glows for each warning. It stops early once you sip", section = generalSection, position = 6)
+		description = "How long the screen glows for each warning. It stops early once you sip", section = advancedSection, position = 3)
 	default int alertDuration()
 	{
 		return 8;
@@ -76,7 +76,7 @@ public interface PotAlertConfig extends Config
 	@Range(min = 0, max = 300)
 	@Units(Units.SECONDS)
 	@ConfigItem(keyName = "remindEvery", name = "Remind again every",
-		description = "How often to repeat the warning until you drink. Leave at 0 for just one warning", section = generalSection, position = 7)
+		description = "How often to repeat the warning until you drink. Stops after 5 reminders. Leave at 0 for just one warning", section = generalSection, position = 3)
 	default int remindEvery()
 	{
 		return 0;
@@ -85,14 +85,17 @@ public interface PotAlertConfig extends Config
 	@Range(min = 0, max = 100)
 	@Units(Units.PERCENT)
 	@ConfigItem(keyName = "volume", name = "Volume",
-		description = "Alert volume. Plays even if your in-game sound effects are muted. Set to 0 to mute all sounds (glow only)", section = generalSection, position = 8)
+		description = "Alert volume. Plays even if your in-game sound effects are muted. Set to 0 to mute all sounds (glow only)", section = generalSection, position = 4)
 	default int volume()
 	{
 		return 50;
 	}
 
-	@ConfigSection(name = "Edge glow", description = "How the screen edge glow looks", position = 1)
+	@ConfigSection(name = "Edge glow", description = "How the screen edge glow looks", position = 2)
 	String glowSection = "glow";
+
+	@ConfigSection(name = "Advanced", description = "Settings most people never need to touch", position = 1, closedByDefault = true)
+	String advancedSection = "advanced";
 
 	@ConfigItem(keyName = "brightenDark", name = "Brighten dark potions",
 		description = "Lightens dark potion colors (anti-venom, overload) so they show up on dark backgrounds. Keeps the same hue", section = glowSection, position = 0)
@@ -143,7 +146,7 @@ public interface PotAlertConfig extends Config
 		return 2;
 	}
 
-	@ConfigSection(name = "Attack", description = "Super attack, divine super attack, attack pots", position = 2, closedByDefault = true)
+	@ConfigSection(name = "Attack", description = "Super attack, divine super attack, attack pots", position = 3, closedByDefault = true)
 	String attackSection = "attack";
 
 	@ConfigItem(keyName = "attackEnabled", name = "Enabled", description = "", section = attackSection, position = 0)
@@ -160,14 +163,7 @@ public interface PotAlertConfig extends Config
 		return 112;
 	}
 
-	@ConfigItem(keyName = "attackUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = attackSection, position = 2)
-	default boolean attackUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "attackColor", name = "Color", description = "Used when 'Use potion color' is off", section = attackSection, position = 3)
+	@ConfigItem(keyName = "attackColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = attackSection, position = 2)
 	default Color attackColor()
 	{
 		return AlertType.ATTACK.getDefaultColor();
@@ -185,7 +181,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Strength", description = "Super strength, divine super strength, strength pots", position = 3, closedByDefault = true)
+	@ConfigSection(name = "Strength", description = "Super strength, divine super strength, strength pots", position = 4, closedByDefault = true)
 	String strengthSection = "strength";
 
 	@ConfigItem(keyName = "strengthEnabled", name = "Enabled", description = "", section = strengthSection, position = 0)
@@ -202,14 +198,7 @@ public interface PotAlertConfig extends Config
 		return 112;
 	}
 
-	@ConfigItem(keyName = "strengthUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = strengthSection, position = 2)
-	default boolean strengthUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "strengthColor", name = "Color", description = "Used when 'Use potion color' is off", section = strengthSection, position = 3)
+	@ConfigItem(keyName = "strengthColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = strengthSection, position = 2)
 	default Color strengthColor()
 	{
 		return AlertType.STRENGTH.getDefaultColor();
@@ -227,7 +216,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Defence", description = "Super defence, divine super defence, defence pots", position = 4, closedByDefault = true)
+	@ConfigSection(name = "Defence", description = "Super defence, divine super defence, defence pots", position = 5, closedByDefault = true)
 	String defenceSection = "defence";
 
 	@ConfigItem(keyName = "defenceEnabled", name = "Enabled", description = "", section = defenceSection, position = 0)
@@ -244,14 +233,7 @@ public interface PotAlertConfig extends Config
 		return 112;
 	}
 
-	@ConfigItem(keyName = "defenceUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = defenceSection, position = 2)
-	default boolean defenceUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "defenceColor", name = "Color", description = "Used when 'Use potion color' is off", section = defenceSection, position = 3)
+	@ConfigItem(keyName = "defenceColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = defenceSection, position = 2)
 	default Color defenceColor()
 	{
 		return AlertType.DEFENCE.getDefaultColor();
@@ -269,7 +251,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Super combat", description = "Super combat, divine super combat, combat pots, CoX elder pots", position = 5, closedByDefault = true)
+	@ConfigSection(name = "Super combat", description = "Super combat, divine super combat, combat pots, CoX elder pots", position = 6, closedByDefault = true)
 	String combatSection = "combat";
 
 	@ConfigItem(keyName = "combatEnabled", name = "Enabled", description = "", section = combatSection, position = 0)
@@ -286,14 +268,7 @@ public interface PotAlertConfig extends Config
 		return 112;
 	}
 
-	@ConfigItem(keyName = "combatUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = combatSection, position = 2)
-	default boolean combatUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "combatColor", name = "Color", description = "Used when 'Use potion color' is off", section = combatSection, position = 3)
+	@ConfigItem(keyName = "combatColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = combatSection, position = 2)
 	default Color combatColor()
 	{
 		return AlertType.COMBAT.getDefaultColor();
@@ -311,7 +286,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Ranging", description = "Ranging, divine ranging pots and Armadyl brew", position = 6, closedByDefault = true)
+	@ConfigSection(name = "Ranging", description = "Ranging, divine ranging pots and Armadyl brew", position = 7, closedByDefault = true)
 	String rangedSection = "ranged";
 
 	@ConfigItem(keyName = "rangedEnabled", name = "Enabled", description = "", section = rangedSection, position = 0)
@@ -328,14 +303,7 @@ public interface PotAlertConfig extends Config
 		return 108;
 	}
 
-	@ConfigItem(keyName = "rangedUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = rangedSection, position = 2)
-	default boolean rangedUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "rangedColor", name = "Color", description = "Used when 'Use potion color' is off", section = rangedSection, position = 3)
+	@ConfigItem(keyName = "rangedColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = rangedSection, position = 2)
 	default Color rangedColor()
 	{
 		return AlertType.RANGED.getDefaultColor();
@@ -353,7 +321,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Bastion", description = "Bastion, divine bastion, and CoX twisted pots", position = 7, closedByDefault = true)
+	@ConfigSection(name = "Bastion", description = "Bastion, divine bastion, and CoX twisted pots", position = 8, closedByDefault = true)
 	String bastionSection = "bastion";
 
 	@ConfigItem(keyName = "bastionEnabled", name = "Enabled", description = "", section = bastionSection, position = 0)
@@ -370,14 +338,7 @@ public interface PotAlertConfig extends Config
 		return 108;
 	}
 
-	@ConfigItem(keyName = "bastionUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = bastionSection, position = 2)
-	default boolean bastionUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "bastionColor", name = "Color", description = "Used when 'Use potion color' is off", section = bastionSection, position = 3)
+	@ConfigItem(keyName = "bastionColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = bastionSection, position = 2)
 	default Color bastionColor()
 	{
 		return AlertType.BASTION.getDefaultColor();
@@ -395,7 +356,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Magic", description = "Magic, divine magic, super magic, ancient and forgotten brew", position = 8, closedByDefault = true)
+	@ConfigSection(name = "Magic", description = "Magic, divine magic, super magic, ancient and forgotten brew", position = 9, closedByDefault = true)
 	String magicSection = "magic";
 
 	@ConfigItem(keyName = "magicEnabled", name = "Enabled", description = "", section = magicSection, position = 0)
@@ -412,14 +373,7 @@ public interface PotAlertConfig extends Config
 		return 101;
 	}
 
-	@ConfigItem(keyName = "magicUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = magicSection, position = 2)
-	default boolean magicUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "magicColor", name = "Color", description = "Used when 'Use potion color' is off", section = magicSection, position = 3)
+	@ConfigItem(keyName = "magicColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = magicSection, position = 2)
 	default Color magicColor()
 	{
 		return AlertType.MAGIC.getDefaultColor();
@@ -437,7 +391,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Battlemage", description = "Battlemage, divine battlemage, and CoX kodai pots", position = 9, closedByDefault = true)
+	@ConfigSection(name = "Battlemage", description = "Battlemage, divine battlemage, and CoX kodai pots", position = 10, closedByDefault = true)
 	String battlemageSection = "battlemage";
 
 	@ConfigItem(keyName = "battlemageEnabled", name = "Enabled", description = "", section = battlemageSection, position = 0)
@@ -454,14 +408,7 @@ public interface PotAlertConfig extends Config
 		return 101;
 	}
 
-	@ConfigItem(keyName = "battlemageUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = battlemageSection, position = 2)
-	default boolean battlemageUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "battlemageColor", name = "Color", description = "Used when 'Use potion color' is off", section = battlemageSection, position = 3)
+	@ConfigItem(keyName = "battlemageColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = battlemageSection, position = 2)
 	default Color battlemageColor()
 	{
 		return AlertType.BATTLEMAGE.getDefaultColor();
@@ -479,7 +426,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Zamorak brew", description = "Zamorak brews and mixes", position = 10, closedByDefault = true)
+	@ConfigSection(name = "Zamorak brew", description = "Zamorak brews and mixes", position = 11, closedByDefault = true)
 	String zamorakSection = "zamorak";
 
 	@ConfigItem(keyName = "zamorakEnabled", name = "Enabled", description = "", section = zamorakSection, position = 0)
@@ -496,14 +443,7 @@ public interface PotAlertConfig extends Config
 		return 0;
 	}
 
-	@ConfigItem(keyName = "zamorakUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = zamorakSection, position = 2)
-	default boolean zamorakUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "zamorakColor", name = "Color", description = "Used when 'Use potion color' is off", section = zamorakSection, position = 3)
+	@ConfigItem(keyName = "zamorakColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = zamorakSection, position = 2)
 	default Color zamorakColor()
 	{
 		return AlertType.ZAMORAK.getDefaultColor();
@@ -521,7 +461,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Imbued / saturated heart", description = "Alerts when your heart is off cooldown and your Magic is low", position = 11, closedByDefault = true)
+	@ConfigSection(name = "Imbued / saturated heart", description = "Alerts when your heart is off cooldown and your Magic is low", position = 12, closedByDefault = true)
 	String heartSection = "heart";
 
 	@ConfigItem(keyName = "heartEnabled", name = "Enabled", description = "", section = heartSection, position = 0)
@@ -538,14 +478,7 @@ public interface PotAlertConfig extends Config
 		return 104;
 	}
 
-	@ConfigItem(keyName = "heartUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = heartSection, position = 2)
-	default boolean heartUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "heartColor", name = "Color", description = "Used when 'Use potion color' is off", section = heartSection, position = 3)
+	@ConfigItem(keyName = "heartColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = heartSection, position = 2)
 	default Color heartColor()
 	{
 		return AlertType.HEART.getDefaultColor();
@@ -563,7 +496,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Overload", description = "NMZ, raids and blighted overloads", position = 12, closedByDefault = true)
+	@ConfigSection(name = "Overload", description = "NMZ, raids and blighted overloads", position = 13, closedByDefault = true)
 	String overloadSection = "overload";
 
 	@ConfigItem(keyName = "overloadEnabled", name = "Enabled", description = "", section = overloadSection, position = 0)
@@ -572,14 +505,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "overloadUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = overloadSection, position = 2)
-	default boolean overloadUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "overloadColor", name = "Color", description = "Used when 'Use potion color' is off", section = overloadSection, position = 3)
+	@ConfigItem(keyName = "overloadColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = overloadSection, position = 2)
 	default Color overloadColor()
 	{
 		return AlertType.OVERLOAD.getDefaultColor();
@@ -597,7 +523,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Absorption", description = "NMZ absorption potions", position = 13, closedByDefault = true)
+	@ConfigSection(name = "Absorption", description = "NMZ absorption potions", position = 14, closedByDefault = true)
 	String absorptionSection = "absorption";
 
 	@ConfigItem(keyName = "absorptionEnabled", name = "Enabled", description = "", section = absorptionSection, position = 0)
@@ -614,14 +540,7 @@ public interface PotAlertConfig extends Config
 		return 100;
 	}
 
-	@ConfigItem(keyName = "absorptionUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = absorptionSection, position = 2)
-	default boolean absorptionUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "absorptionColor", name = "Color", description = "Used when 'Use potion color' is off", section = absorptionSection, position = 3)
+	@ConfigItem(keyName = "absorptionColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = absorptionSection, position = 2)
 	default Color absorptionColor()
 	{
 		return AlertType.ABSORPTION.getDefaultColor();
@@ -639,7 +558,34 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Smelling salts", description = "Tombs of Amascut smelling salts", position = 14, closedByDefault = true)
+	@ConfigSection(name = "Surge", description = "Surge potions. Warns when the cooldown is over and your spec is 75% or lower", position = 15, closedByDefault = true)
+	String surgeSection = "surge";
+
+	@ConfigItem(keyName = "surgeEnabled", name = "Enabled", description = "", section = surgeSection, position = 0)
+	default boolean surgeEnabled()
+	{
+		return true;
+	}
+
+	@ConfigItem(keyName = "surgeColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = surgeSection, position = 2)
+	default Color surgeColor()
+	{
+		return AlertType.SURGE.getDefaultColor();
+	}
+
+	@ConfigItem(keyName = "surgeSound", name = "Sound", description = "Off for glow only. A custom sound picked in the Pot Alert sidebar overrides this", section = surgeSection, position = 4)
+	default AlertSound surgeSound()
+	{
+		return AlertType.SURGE.getDefaultSound();
+	}
+
+	@ConfigItem(keyName = "surgeCustomFile", name = "Custom file", description = "", section = surgeSection, position = 5, hidden = true)
+	default String surgeCustomFile()
+	{
+		return "";
+	}
+
+	@ConfigSection(name = "Smelling salts", description = "Tombs of Amascut smelling salts", position = 16, closedByDefault = true)
 	String saltsSection = "salts";
 
 	@ConfigItem(keyName = "saltsEnabled", name = "Enabled", description = "", section = saltsSection, position = 0)
@@ -648,14 +594,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "saltsUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = saltsSection, position = 2)
-	default boolean saltsUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "saltsColor", name = "Color", description = "Used when 'Use potion color' is off", section = saltsSection, position = 3)
+	@ConfigItem(keyName = "saltsColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = saltsSection, position = 2)
 	default Color saltsColor()
 	{
 		return AlertType.SALTS.getDefaultColor();
@@ -673,7 +612,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Anti-poison / venom", description = "Antipoison, antidote, anti-venom, sanfew", position = 15, closedByDefault = true)
+	@ConfigSection(name = "Anti-poison / venom", description = "Antipoison, antidote, anti-venom, sanfew", position = 17, closedByDefault = true)
 	String poisonSection = "poison";
 
 	@ConfigItem(keyName = "poisonEnabled", name = "Enabled", description = "", section = poisonSection, position = 0)
@@ -696,14 +635,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "poisonUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = poisonSection, position = 2)
-	default boolean poisonUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "poisonColor", name = "Color", description = "Used when 'Use potion color' is off", section = poisonSection, position = 3)
+	@ConfigItem(keyName = "poisonColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = poisonSection, position = 2)
 	default Color poisonColor()
 	{
 		return AlertType.POISON.getDefaultColor();
@@ -721,7 +653,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Antifire", description = "Antifire, super antifire, extended versions", position = 16, closedByDefault = true)
+	@ConfigSection(name = "Antifire", description = "Antifire, super antifire, extended versions", position = 18, closedByDefault = true)
 	String antifireSection = "antifire";
 
 	@ConfigItem(keyName = "antifireEnabled", name = "Enabled", description = "", section = antifireSection, position = 0)
@@ -737,14 +669,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "antifireUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = antifireSection, position = 2)
-	default boolean antifireUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "antifireColor", name = "Color", description = "Used when 'Use potion color' is off", section = antifireSection, position = 3)
+	@ConfigItem(keyName = "antifireColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = antifireSection, position = 2)
 	default Color antifireColor()
 	{
 		return AlertType.ANTIFIRE.getDefaultColor();
@@ -762,7 +687,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Prayer regeneration", description = "Prayer regeneration potions", position = 17, closedByDefault = true)
+	@ConfigSection(name = "Prayer regeneration", description = "Prayer regeneration potions", position = 19, closedByDefault = true)
 	String prayerregenSection = "prayerregen";
 
 	@ConfigItem(keyName = "prayerregenEnabled", name = "Enabled", description = "", section = prayerregenSection, position = 0)
@@ -771,14 +696,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "prayerregenUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = prayerregenSection, position = 2)
-	default boolean prayerregenUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "prayerregenColor", name = "Color", description = "Used when 'Use potion color' is off", section = prayerregenSection, position = 3)
+	@ConfigItem(keyName = "prayerregenColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = prayerregenSection, position = 2)
 	default Color prayerregenColor()
 	{
 		return AlertType.PRAYER_REGEN.getDefaultColor();
@@ -796,7 +714,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Prayer enhance", description = "Chambers of Xeric prayer enhance", position = 18, closedByDefault = true)
+	@ConfigSection(name = "Prayer enhance", description = "Chambers of Xeric prayer enhance", position = 20, closedByDefault = true)
 	String enhanceSection = "enhance";
 
 	@ConfigItem(keyName = "enhanceEnabled", name = "Enabled", description = "", section = enhanceSection, position = 0)
@@ -805,14 +723,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "enhanceUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = enhanceSection, position = 2)
-	default boolean enhanceUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "enhanceColor", name = "Color", description = "Used when 'Use potion color' is off", section = enhanceSection, position = 3)
+	@ConfigItem(keyName = "enhanceColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = enhanceSection, position = 2)
 	default Color enhanceColor()
 	{
 		return AlertType.ENHANCE.getDefaultColor();
@@ -830,7 +741,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Liquid adrenaline", description = "Tombs of Amascut liquid adrenaline", position = 19, closedByDefault = true)
+	@ConfigSection(name = "Liquid adrenaline", description = "Tombs of Amascut liquid adrenaline", position = 21, closedByDefault = true)
 	String adrenalineSection = "adrenaline";
 
 	@ConfigItem(keyName = "adrenalineEnabled", name = "Enabled", description = "", section = adrenalineSection, position = 0)
@@ -839,14 +750,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "adrenalineUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = adrenalineSection, position = 2)
-	default boolean adrenalineUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "adrenalineColor", name = "Color", description = "Used when 'Use potion color' is off", section = adrenalineSection, position = 3)
+	@ConfigItem(keyName = "adrenalineColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = adrenalineSection, position = 2)
 	default Color adrenalineColor()
 	{
 		return AlertType.ADRENALINE.getDefaultColor();
@@ -864,7 +768,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Menaphite remedy", description = "Menaphite remedy", position = 20, closedByDefault = true)
+	@ConfigSection(name = "Menaphite remedy", description = "Menaphite remedy", position = 22, closedByDefault = true)
 	String remedySection = "remedy";
 
 	@ConfigItem(keyName = "remedyEnabled", name = "Enabled", description = "", section = remedySection, position = 0)
@@ -873,14 +777,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "remedyUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = remedySection, position = 2)
-	default boolean remedyUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "remedyColor", name = "Color", description = "Used when 'Use potion color' is off", section = remedySection, position = 3)
+	@ConfigItem(keyName = "remedyColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = remedySection, position = 2)
 	default Color remedyColor()
 	{
 		return AlertType.REMEDY.getDefaultColor();
@@ -898,7 +795,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Stamina", description = "Stamina potions and mixes", position = 21, closedByDefault = true)
+	@ConfigSection(name = "Stamina", description = "Stamina potions and mixes", position = 23, closedByDefault = true)
 	String staminaSection = "stamina";
 
 	@ConfigItem(keyName = "staminaEnabled", name = "Enabled", description = "", section = staminaSection, position = 0)
@@ -907,14 +804,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "staminaUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = staminaSection, position = 2)
-	default boolean staminaUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "staminaColor", name = "Color", description = "Used when 'Use potion color' is off", section = staminaSection, position = 3)
+	@ConfigItem(keyName = "staminaColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = staminaSection, position = 2)
 	default Color staminaColor()
 	{
 		return AlertType.STAMINA.getDefaultColor();
@@ -932,7 +822,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Goading", description = "Goading potions", position = 22, closedByDefault = true)
+	@ConfigSection(name = "Goading", description = "Goading potions", position = 24, closedByDefault = true)
 	String goadingSection = "goading";
 
 	@ConfigItem(keyName = "goadingEnabled", name = "Enabled", description = "", section = goadingSection, position = 0)
@@ -941,14 +831,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "goadingUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = goadingSection, position = 2)
-	default boolean goadingUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "goadingColor", name = "Color", description = "Used when 'Use potion color' is off", section = goadingSection, position = 3)
+	@ConfigItem(keyName = "goadingColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = goadingSection, position = 2)
 	default Color goadingColor()
 	{
 		return AlertType.GOADING.getDefaultColor();
@@ -966,7 +849,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Fishing", description = "Fishing and super fishing potions. Warns even with Only in combat on", position = 23, closedByDefault = true)
+	@ConfigSection(name = "Fishing", description = "Fishing and super fishing potions. Warns even with Only in combat on", position = 25, closedByDefault = true)
 	String fishingSection = "fishing";
 
 	@ConfigItem(keyName = "fishingEnabled", name = "Enabled", description = "", section = fishingSection, position = 0)
@@ -983,14 +866,7 @@ public interface PotAlertConfig extends Config
 		return 0;
 	}
 
-	@ConfigItem(keyName = "fishingUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = fishingSection, position = 2)
-	default boolean fishingUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "fishingColor", name = "Color", description = "Used when 'Use potion color' is off", section = fishingSection, position = 3)
+	@ConfigItem(keyName = "fishingColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = fishingSection, position = 2)
 	default Color fishingColor()
 	{
 		return AlertType.FISHING.getDefaultColor();
@@ -1008,7 +884,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Hunter", description = "Hunter and super hunter potions. Warns even with Only in combat on", position = 24, closedByDefault = true)
+	@ConfigSection(name = "Hunter", description = "Hunter and super hunter potions. Warns even with Only in combat on", position = 26, closedByDefault = true)
 	String hunterSection = "hunter";
 
 	@ConfigItem(keyName = "hunterEnabled", name = "Enabled", description = "", section = hunterSection, position = 0)
@@ -1025,14 +901,7 @@ public interface PotAlertConfig extends Config
 		return 0;
 	}
 
-	@ConfigItem(keyName = "hunterUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = hunterSection, position = 2)
-	default boolean hunterUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "hunterColor", name = "Color", description = "Used when 'Use potion color' is off", section = hunterSection, position = 3)
+	@ConfigItem(keyName = "hunterColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = hunterSection, position = 2)
 	default Color hunterColor()
 	{
 		return AlertType.HUNTER.getDefaultColor();
@@ -1050,7 +919,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Agility", description = "Agility potions and mixes. Warns even with Only in combat on", position = 25, closedByDefault = true)
+	@ConfigSection(name = "Agility", description = "Agility potions and mixes. Warns even with Only in combat on", position = 27, closedByDefault = true)
 	String agilitySection = "agility";
 
 	@ConfigItem(keyName = "agilityEnabled", name = "Enabled", description = "", section = agilitySection, position = 0)
@@ -1067,14 +936,7 @@ public interface PotAlertConfig extends Config
 		return 0;
 	}
 
-	@ConfigItem(keyName = "agilityUsePotionColor", name = "Use potion color",
-		description = "Glow in the color of the pot in your inventory. Turn off to use the color below", section = agilitySection, position = 2)
-	default boolean agilityUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "agilityColor", name = "Color", description = "Used when 'Use potion color' is off", section = agilitySection, position = 3)
+	@ConfigItem(keyName = "agilityColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = agilitySection, position = 2)
 	default Color agilityColor()
 	{
 		return AlertType.AGILITY.getDefaultColor();
@@ -1092,7 +954,7 @@ public interface PotAlertConfig extends Config
 		return "";
 	}
 
-	@ConfigSection(name = "Prayer", description = "Prayer pots, super restores, sanfew, CoX revitalisation, ToA tears of Elidinis and scarabs", position = 26, closedByDefault = true)
+	@ConfigSection(name = "Prayer", description = "Prayer pots, super restores, sanfew, CoX revitalisation, ToA tears of Elidinis and scarabs", position = 28, closedByDefault = true)
 	String prayerSection = "prayer";
 
 	@ConfigItem(keyName = "prayerEnabled", name = "Enabled", description = "", section = prayerSection, position = 0)
@@ -1116,14 +978,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "prayerUsePotionColor", name = "Use potion color",
-		description = "Glow prayer potion teal for every prayer and restore pot. Turn off to use the color below", section = prayerSection, position = 2)
-	default boolean prayerUsePotionColor()
-	{
-		return true;
-	}
-
-	@ConfigItem(keyName = "prayerColor", name = "Color", description = "Used when 'Use potion color' is off", section = prayerSection, position = 3)
+	@ConfigItem(keyName = "prayerColor", name = "Color", description = "Prayer pots all glow prayer potion teal. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = prayerSection, position = 2)
 	default Color prayerColor()
 	{
 		return AlertType.PRAYER.getDefaultColor();

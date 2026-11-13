@@ -13,19 +13,20 @@ When a pot is about to run out, your screen edges glow in that pot's color and i
 
 ### What it covers
 
-- Combat boosts: attack, strength, defence, super combat, ranging, bastion, magic, battlemage, zamorak brew and armadyl brew, including divines, mixes and raid versions. Warns at your Resip at level.
+- Combat boosts: attack, strength, defence, super combat, ranging, bastion, magic, battlemage, zamorak brew and armadyl brew, including divines, mixes and raid versions. Warns at your Resip at level. Divines warn before they run out if you have another divine on you. With only regular pots they warn right when they run out, since drinking before that wastes the dose.
 - Skilling boosts: fishing, hunter and agility. Warns at your Resip at level.
-- Timed pots: divines, overload, smelling salts, anti-venom, antifire, prayer regen, prayer enhance, liquid adrenaline, menaphite remedy, stamina and goading. Warns before they run out.
+- Timed pots: overload, smelling salts, anti-venom, antifire, prayer regen, prayer enhance, liquid adrenaline, menaphite remedy, stamina and goading. Warns before they run out.
 - Prayer: prayer pots, super restores, sanfew, revitalisation, tears of elidinis and blessed crystal scarabs. Warns at your Alert at prayer.
 - Absorption: warns at your Alert at absorption. It only starts watching once you've drunk above that, so starting a dream won't set it off.
 - Imbued and saturated heart: warns when it's ready and your magic is low.
+- Surge potion: warns when the cooldown is over and your spec is 75% or lower.
 
-Anti-venom and antifire also warn once when they actually run out, even if you're out of pots, so you know to tele.
+Anti-venom and antifire also warn once when they actually run out, even if you're out of pots, so you know to tele. After anti-venom runs out it doesn't bug you about the leftover antipoison part, but if you get poisoned later it'll still tell you.
 
 ### Settings worth knowing
 
-- Remind again every: turn this on if you want repeat warnings. 0 means one warning only.
-- Wait after big stat drop (6 seconds by default): after a brew or nectar knocks your boosts down, it gives you a few seconds to repot before warning. 0 turns it off.
+- Remind again every: turn this on if you want repeat warnings. It stops after 5. 0 means one warning only.
+- Wait after big stat drop (in Advanced, 6 seconds by default): after a brew or nectar knocks your boosts down, it gives you a few seconds to repot before warning. 0 turns it off.
 - Match my weapon (off by default): combat boosts only warn for the style you're using. The rest wait until you swap.
 - Brighten dark potions (on by default): makes dark pots like anti-venom and overload easier to see.
 - Highlight pot in inventory (on by default): outlines the pot you need. Outline thickness goes from 1 (thin) to 3 (extra bold).
