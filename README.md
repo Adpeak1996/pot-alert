@@ -13,7 +13,7 @@ When a pot is about to run out, your screen edges glow in that pot's color and i
 
 ### What it covers
 
-- Combat boosts: attack, strength, defence, super combat, ranging, bastion, magic, battlemage, zamorak brew and armadyl brew, including divines, mixes and raid versions. Warns at your Resip at level. Divines warn before they run out if you have another divine on you. With only regular pots they warn right when they run out, since drinking before that wastes the dose.
+- Combat boosts: attack, strength, defence, super combat, ranging, bastion, magic, battlemage, zamorak brew and armadyl brew, including divines, mixes and raid versions. Warns at your Resip at level. Divines warn before they run out if you have another divine, or right when they run out if you only have regular pots, so you don't waste a dose.
 - Skilling boosts: fishing, hunter and agility. Warns at your Resip at level.
 - Timed pots: overload, smelling salts, anti-venom, antifire, prayer regen, prayer enhance, liquid adrenaline, menaphite remedy, stamina and goading. Warns before they run out.
 - Prayer: prayer pots, super restores, sanfew, revitalisation, tears of elidinis and blessed crystal scarabs. Warns at your Alert at prayer.
@@ -21,7 +21,7 @@ When a pot is about to run out, your screen edges glow in that pot's color and i
 - Imbued and saturated heart: warns when it's ready and your magic is low.
 - Surge potion: warns when the cooldown is over and your spec is 75% or lower.
 
-Anti-venom and antifire also warn once when they actually run out, even if you're out of pots, so you know to tele. After anti-venom runs out it doesn't bug you about the leftover antipoison part, but if you get poisoned later it'll still tell you.
+Anti-venom and antifire also warn once when they actually run out, even if you're out of pots, so you know to tele. It won't bug you about anti-venom's leftover antipoison part.
 
 ### Settings worth knowing
 
@@ -32,7 +32,7 @@ Anti-venom and antifire also warn once when they actually run out, even if you'r
 - Highlight pot in inventory (on by default): outlines the pot you need. Outline thickness goes from 1 (thin) to 3 (extra bold).
 - Only in combat: only warns while you're fighting. Skilling pots still warn.
 - Every pot has its own sound, like a snake hiss for anti-venom and dragon breath for antifire. You can pick a different one, use your own .wav, or turn it off for glow only. Volume 0 mutes everything.
-- The glow uses the pot's actual color, or you can pick your own.
+- The glow uses the pot's actual color, or you can pick your own. Right-click Color and pick Reset to go back.
 
 There's also a Pot Alert tab in the sidebar where you can test any pot's warning and add your own sounds.
 
