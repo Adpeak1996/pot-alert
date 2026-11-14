@@ -2,11 +2,14 @@ package com.potalert;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -28,6 +31,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.Filepath;
 
@@ -39,33 +43,30 @@ class PotAlertPanel extends PluginPanel
 
 	private static final String INTRO = OPEN
 		+ "<font size='+1' color='#ff981f'><b>Pot Alert</b></font><br>"
-		+ "Your screen glows in the pot's color with a sound when it's time to drink.<br><br>"
-		+ "<font color='#ff981f'><b>How it works</b></font><br>"
+		+ "Your screen glows in the pot's color with a sound when it's time to drink."
+		+ CLOSE;
+
+	private static final String TEST_HELP = OPEN
+		+ "Pick a pot to see and hear its warning."
+		+ CLOSE;
+
+	private static final String HOW = OPEN
 		+ "&bull; Warns once, then goes quiet<br>"
 		+ "&bull; Ready again once you drink<br>"
 		+ "&bull; Only pots in your inventory<br>"
 		+ "&bull; Only boosts you've actually drunk"
 		+ CLOSE;
 
-	private static final String TEST_HELP = OPEN
-		+ "<font color='#ff981f'><b>Test</b></font><br>"
-		+ "Pick a pot to see and hear its warning."
-		+ CLOSE;
-
-	private static final String CUSTOM_HELP = OPEN
-		+ "<font color='#ff981f'><b>Custom sounds</b></font><br>"
-		+ "Click <i>Add</i> to pick .wav files, then choose one for any pot."
-		+ CLOSE;
-
-	private static final String REFERENCE = OPEN
-		+ "<font color='#ff981f'><b>When it warns</b></font><br>"
+	private static final String WARNS = OPEN
 		+ "<b>Boosts:</b> at your <i>Resip at level</i><br>"
 		+ "<b>Timed pots:</b> before they run out<br>"
 		+ "<b>Prayer:</b> at your <i>Alert at prayer</i><br>"
 		+ "<b>Surge:</b> when it's off cooldown and your spec is 75% or lower<br>"
 		+ "<b>Absorption:</b> at your <i>Alert at absorption</i>, once you've drunk above it<br>"
-		+ "<b>Anti-venom, antifire:</b> before they run out, and again when they do<br><br>"
-		+ "<font color='#ff981f'><b>Tips</b></font><br>"
+		+ "<b>Anti-venom, antifire:</b> before they run out, and again when they do"
+		+ CLOSE;
+
+	private static final String TIPS = OPEN
 		+ "&bull; Want repeats? Set <i>Remind again every</i>. It stops after 5. 0 is one warning only<br>"
 		+ "&bull; Sound <i>Off</i> is glow only for that pot. <i>Volume</i> 0 mutes everything<br>"
 		+ "&bull; <i>Brighten dark potions</i> (on by default) makes dark pots easier to see<br>"
@@ -74,6 +75,10 @@ class PotAlertPanel extends PluginPanel
 		+ "&bull; <i>Match my weapon</i> (off by default) only warns for the style you're using<br>"
 		+ "&bull; Skilling pots still warn with <i>Only in combat</i> on<br>"
 		+ "&bull; Raid pots count as their normal versions"
+		+ CLOSE;
+
+	private static final String CUSTOM_HELP = OPEN
+		+ "Click <i>Add</i> to pick .wav files, then choose one for any pot."
 		+ CLOSE;
 
 	private final PotAlertPlugin plugin;
@@ -97,10 +102,12 @@ class PotAlertPanel extends PluginPanel
 
 		content.add(left(new JLabel(INTRO)));
 		content.add(gap());
-		content.add(left(new JLabel(TEST_HELP)));
-		content.add(gap());
+
+		JPanel testBody = section(content, "Test", true);
+		testBody.add(left(new JLabel(TEST_HELP)));
+		testBody.add(smallGap());
 		JPanel testRow = new JPanel(new BorderLayout(4, 0));
-		testRow.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		testRow.setOpaque(false);
 		JComboBox<String> testPicker = new JComboBox<>();
 		testPicker.setFocusable(false);
 		for (AlertType type : AlertType.values())
@@ -111,35 +118,38 @@ class PotAlertPanel extends PluginPanel
 		test.addActionListener(e -> plugin.preview(AlertType.values()[testPicker.getSelectedIndex()]));
 		testRow.add(testPicker, BorderLayout.CENTER);
 		testRow.add(test, BorderLayout.EAST);
-		content.add(left(testRow));
-		content.add(gap());
-		content.add(gap());
-		content.add(left(new JLabel(CUSTOM_HELP)));
-		content.add(gap());
+		testBody.add(left(testRow));
 
+		section(content, "How it works", true).add(left(new JLabel(HOW)));
+		section(content, "When it warns", false).add(left(new JLabel(WARNS)));
+		section(content, "Tips", false).add(left(new JLabel(TIPS)));
+
+		JPanel soundBody = section(content, "Custom sounds", false);
+		soundBody.add(left(new JLabel(CUSTOM_HELP)));
+		soundBody.add(smallGap());
 		JPanel folderRow = new JPanel(new GridLayout(1, 2, 4, 0));
-		folderRow.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		folderRow.setOpaque(false);
 		JButton add = button("Add");
 		add.addActionListener(e -> addSounds());
 		JButton remove = button("Remove");
 		remove.addActionListener(e -> removeSound());
 		folderRow.add(add);
 		folderRow.add(remove);
-		content.add(left(folderRow));
-		content.add(gap());
+		soundBody.add(left(folderRow));
+		soundBody.add(smallGap());
 
 		JPanel pickerGrid = new JPanel(new GridLayout(0, 1, 0, 2));
-		pickerGrid.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		pickerGrid.setOpaque(false);
 		for (AlertType type : AlertType.values())
 		{
 			JPanel row = new JPanel(new BorderLayout(4, 0));
-			row.setBackground(ColorScheme.DARK_GRAY_COLOR);
+			row.setOpaque(false);
 			JLabel label = new JLabel(type.getLabel());
-			label.setPreferredSize(new Dimension(82, 20));
+			label.setPreferredSize(new Dimension(78, 20));
 			JComboBox<String> picker = new JComboBox<>();
 			picker.setFocusable(false);
 			picker.setPrototypeDisplayValue(SETTINGS_SOUND);
-			picker.setPreferredSize(new Dimension(100, 22));
+			picker.setPreferredSize(new Dimension(96, 22));
 			picker.setRenderer(new TruncatingRenderer());
 			picker.addActionListener(e -> onPick(type, picker));
 			pickers.put(type, picker);
@@ -147,15 +157,15 @@ class PotAlertPanel extends PluginPanel
 			row.add(picker, BorderLayout.CENTER);
 			pickerGrid.add(row);
 		}
-		content.add(left(pickerGrid));
-		content.add(gap());
-		content.add(gap());
-		content.add(left(new JLabel(REFERENCE)));
-		content.add(gap());
+		soundBody.add(left(pickerGrid));
 
+		content.add(gap());
 		JButton reset = button("Reset all settings");
 		reset.addActionListener(e -> confirmReset());
-		content.add(left(reset));
+		JPanel resetRow = new JPanel(new BorderLayout());
+		resetRow.setOpaque(false);
+		resetRow.add(reset, BorderLayout.CENTER);
+		content.add(left(resetRow));
 
 		JScrollPane scroll = new JScrollPane(content);
 		scroll.setBorder(null);
@@ -398,6 +408,58 @@ class PotAlertPanel extends PluginPanel
 		gap.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		gap.setPreferredSize(new Dimension(0, 10));
 		gap.setMaximumSize(new Dimension(Integer.MAX_VALUE, 10));
+		return gap;
+	}
+
+	/**
+	 * Adds a section with a clickable header that opens and closes it, like RuneLite's settings.
+	 * Returns the body to put things in.
+	 */
+	private static JPanel section(JPanel parent, String title, boolean open)
+	{
+		JPanel wrapper = new JPanel(new BorderLayout());
+		wrapper.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		wrapper.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+		JLabel header = new JLabel();
+		header.setForeground(ColorScheme.BRAND_ORANGE);
+		header.setFont(FontManager.getRunescapeBoldFont());
+		header.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+		header.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+		JPanel body = new JPanel();
+		body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+		body.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		body.setBorder(BorderFactory.createEmptyBorder(0, 8, 8, 8));
+		body.setVisible(open);
+		header.setText((open ? "\u25BE  " : "\u25B8  ") + title);
+
+		header.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				boolean show = !body.isVisible();
+				body.setVisible(show);
+				header.setText((show ? "\u25BE  " : "\u25B8  ") + title);
+				parent.revalidate();
+				parent.repaint();
+			}
+		});
+
+		wrapper.add(header, BorderLayout.NORTH);
+		wrapper.add(body, BorderLayout.CENTER);
+		parent.add(left(wrapper));
+		parent.add(smallGap());
+		return body;
+	}
+
+	private static Component smallGap()
+	{
+		JPanel gap = new JPanel();
+		gap.setOpaque(false);
+		gap.setPreferredSize(new Dimension(0, 6));
+		gap.setMaximumSize(new Dimension(Integer.MAX_VALUE, 6));
 		return gap;
 	}
 

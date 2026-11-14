@@ -168,6 +168,7 @@ public class PotAlertPlugin extends Plugin
 	/** Colors of the alerts currently up, read by the overlay. */
 	private volatile List<Color> activeColors = Collections.emptyList();
 	private volatile Map<Integer, Color> activeHighlights = Collections.emptyMap();
+	private volatile Map<Integer, Color> previewHighlights = Collections.emptyMap();
 	private volatile long glowStart;
 
 	// Test button state
@@ -296,6 +297,10 @@ public class PotAlertPlugin extends Plugin
 	/** What the overlay should draw right now: a test alert if one is running, otherwise the real alerts. */
 	Map<Integer, Color> getHighlights()
 	{
+		if (previewColor != null && System.currentTimeMillis() < previewUntil)
+		{
+			return previewHighlights;
+		}
 		return activeHighlights;
 	}
 
@@ -375,6 +380,11 @@ public class PotAlertPlugin extends Plugin
 		previewUntil = System.currentTimeMillis() + PREVIEW_MILLIS;
 		glowStart = System.currentTimeMillis();
 		playSound(type);
+
+		// Outline that pot in your inventory too, so the test shows the whole warning
+		Map<AlertType, Color> testing = new EnumMap<>(AlertType.class);
+		testing.put(type, color);
+		clientThread.invokeLater(() -> previewHighlights = findHighlights(testing));
 	}
 
 	private boolean isOpen(int componentId)

@@ -163,7 +163,7 @@ public interface PotAlertConfig extends Config
 		return 112;
 	}
 
-	@ConfigItem(keyName = "attackColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = attackSection, position = 2)
+	@ConfigItem(keyName = "attackColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = attackSection, position = 3)
 	default Color attackColor()
 	{
 		return AlertType.ATTACK.getDefaultColor();
@@ -198,7 +198,7 @@ public interface PotAlertConfig extends Config
 		return 112;
 	}
 
-	@ConfigItem(keyName = "strengthColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = strengthSection, position = 2)
+	@ConfigItem(keyName = "strengthColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = strengthSection, position = 3)
 	default Color strengthColor()
 	{
 		return AlertType.STRENGTH.getDefaultColor();
@@ -233,7 +233,7 @@ public interface PotAlertConfig extends Config
 		return 112;
 	}
 
-	@ConfigItem(keyName = "defenceColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = defenceSection, position = 2)
+	@ConfigItem(keyName = "defenceColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = defenceSection, position = 3)
 	default Color defenceColor()
 	{
 		return AlertType.DEFENCE.getDefaultColor();
@@ -268,7 +268,7 @@ public interface PotAlertConfig extends Config
 		return 112;
 	}
 
-	@ConfigItem(keyName = "combatColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = combatSection, position = 2)
+	@ConfigItem(keyName = "combatColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = combatSection, position = 3)
 	default Color combatColor()
 	{
 		return AlertType.COMBAT.getDefaultColor();
@@ -303,7 +303,7 @@ public interface PotAlertConfig extends Config
 		return 108;
 	}
 
-	@ConfigItem(keyName = "rangedColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = rangedSection, position = 2)
+	@ConfigItem(keyName = "rangedColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = rangedSection, position = 3)
 	default Color rangedColor()
 	{
 		return AlertType.RANGED.getDefaultColor();
@@ -338,7 +338,7 @@ public interface PotAlertConfig extends Config
 		return 108;
 	}
 
-	@ConfigItem(keyName = "bastionColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = bastionSection, position = 2)
+	@ConfigItem(keyName = "bastionColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = bastionSection, position = 3)
 	default Color bastionColor()
 	{
 		return AlertType.BASTION.getDefaultColor();
@@ -373,7 +373,7 @@ public interface PotAlertConfig extends Config
 		return 101;
 	}
 
-	@ConfigItem(keyName = "magicColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = magicSection, position = 2)
+	@ConfigItem(keyName = "magicColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = magicSection, position = 3)
 	default Color magicColor()
 	{
 		return AlertType.MAGIC.getDefaultColor();
@@ -408,7 +408,7 @@ public interface PotAlertConfig extends Config
 		return 101;
 	}
 
-	@ConfigItem(keyName = "battlemageColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = battlemageSection, position = 2)
+	@ConfigItem(keyName = "battlemageColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = battlemageSection, position = 3)
 	default Color battlemageColor()
 	{
 		return AlertType.BATTLEMAGE.getDefaultColor();
@@ -443,7 +443,7 @@ public interface PotAlertConfig extends Config
 		return 0;
 	}
 
-	@ConfigItem(keyName = "zamorakColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = zamorakSection, position = 2)
+	@ConfigItem(keyName = "zamorakColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = zamorakSection, position = 3)
 	default Color zamorakColor()
 	{
 		return AlertType.ZAMORAK.getDefaultColor();
@@ -478,7 +478,7 @@ public interface PotAlertConfig extends Config
 		return 104;
 	}
 
-	@ConfigItem(keyName = "heartColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = heartSection, position = 2)
+	@ConfigItem(keyName = "heartColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = heartSection, position = 3)
 	default Color heartColor()
 	{
 		return AlertType.HEART.getDefaultColor();
@@ -505,7 +505,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "overloadColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = overloadSection, position = 2)
+	@ConfigItem(keyName = "overloadColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = overloadSection, position = 3)
 	default Color overloadColor()
 	{
 		return AlertType.OVERLOAD.getDefaultColor();
@@ -540,7 +540,7 @@ public interface PotAlertConfig extends Config
 		return 100;
 	}
 
-	@ConfigItem(keyName = "absorptionColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = absorptionSection, position = 2)
+	@ConfigItem(keyName = "absorptionColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = absorptionSection, position = 3)
 	default Color absorptionColor()
 	{
 		return AlertType.ABSORPTION.getDefaultColor();
@@ -567,7 +567,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "surgeColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = surgeSection, position = 2)
+	@ConfigItem(keyName = "surgeColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = surgeSection, position = 3)
 	default Color surgeColor()
 	{
 		return AlertType.SURGE.getDefaultColor();
@@ -594,7 +594,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "saltsColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = saltsSection, position = 2)
+	@ConfigItem(keyName = "saltsColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = saltsSection, position = 3)
 	default Color saltsColor()
 	{
 		return AlertType.SALTS.getDefaultColor();
@@ -629,13 +629,13 @@ public interface PotAlertConfig extends Config
 	}
 
 	@ConfigItem(keyName = "poisonWhenPoisoned", name = "Alert if poisoned",
-		description = "Also alert if you actually get poisoned or venomed and have a cure on you", section = poisonSection, position = 1)
+		description = "Also alert if you actually get poisoned or venomed and have a cure on you", section = poisonSection, position = 2)
 	default boolean poisonWhenPoisoned()
 	{
 		return true;
 	}
 
-	@ConfigItem(keyName = "poisonColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = poisonSection, position = 2)
+	@ConfigItem(keyName = "poisonColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = poisonSection, position = 3)
 	default Color poisonColor()
 	{
 		return AlertType.POISON.getDefaultColor();
@@ -669,7 +669,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "antifireColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = antifireSection, position = 2)
+	@ConfigItem(keyName = "antifireColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = antifireSection, position = 3)
 	default Color antifireColor()
 	{
 		return AlertType.ANTIFIRE.getDefaultColor();
@@ -696,7 +696,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "prayerregenColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = prayerregenSection, position = 2)
+	@ConfigItem(keyName = "prayerregenColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = prayerregenSection, position = 3)
 	default Color prayerregenColor()
 	{
 		return AlertType.PRAYER_REGEN.getDefaultColor();
@@ -723,7 +723,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "enhanceColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = enhanceSection, position = 2)
+	@ConfigItem(keyName = "enhanceColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = enhanceSection, position = 3)
 	default Color enhanceColor()
 	{
 		return AlertType.ENHANCE.getDefaultColor();
@@ -750,7 +750,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "adrenalineColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = adrenalineSection, position = 2)
+	@ConfigItem(keyName = "adrenalineColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = adrenalineSection, position = 3)
 	default Color adrenalineColor()
 	{
 		return AlertType.ADRENALINE.getDefaultColor();
@@ -777,7 +777,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "remedyColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = remedySection, position = 2)
+	@ConfigItem(keyName = "remedyColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = remedySection, position = 3)
 	default Color remedyColor()
 	{
 		return AlertType.REMEDY.getDefaultColor();
@@ -804,7 +804,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "staminaColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = staminaSection, position = 2)
+	@ConfigItem(keyName = "staminaColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = staminaSection, position = 3)
 	default Color staminaColor()
 	{
 		return AlertType.STAMINA.getDefaultColor();
@@ -831,7 +831,7 @@ public interface PotAlertConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(keyName = "goadingColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = goadingSection, position = 2)
+	@ConfigItem(keyName = "goadingColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = goadingSection, position = 3)
 	default Color goadingColor()
 	{
 		return AlertType.GOADING.getDefaultColor();
@@ -866,7 +866,7 @@ public interface PotAlertConfig extends Config
 		return 0;
 	}
 
-	@ConfigItem(keyName = "fishingColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = fishingSection, position = 2)
+	@ConfigItem(keyName = "fishingColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = fishingSection, position = 3)
 	default Color fishingColor()
 	{
 		return AlertType.FISHING.getDefaultColor();
@@ -901,7 +901,7 @@ public interface PotAlertConfig extends Config
 		return 0;
 	}
 
-	@ConfigItem(keyName = "hunterColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = hunterSection, position = 2)
+	@ConfigItem(keyName = "hunterColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = hunterSection, position = 3)
 	default Color hunterColor()
 	{
 		return AlertType.HUNTER.getDefaultColor();
@@ -936,7 +936,7 @@ public interface PotAlertConfig extends Config
 		return 0;
 	}
 
-	@ConfigItem(keyName = "agilityColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = agilitySection, position = 2)
+	@ConfigItem(keyName = "agilityColor", name = "Color", description = "Glows in the pot's own color. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = agilitySection, position = 3)
 	default Color agilityColor()
 	{
 		return AlertType.AGILITY.getDefaultColor();
@@ -972,13 +972,13 @@ public interface PotAlertConfig extends Config
 	}
 
 	@ConfigItem(keyName = "prayerOnLogin", name = "Alert on login",
-		description = "Alert right when you log in if your prayer is low. Off waits until you fight or drink a pot", section = prayerSection, position = 1)
+		description = "Alert right when you log in if your prayer is low. Off waits until you fight or drink a pot", section = prayerSection, position = 2)
 	default boolean prayerOnLogin()
 	{
 		return true;
 	}
 
-	@ConfigItem(keyName = "prayerColor", name = "Color", description = "Prayer pots all glow prayer potion teal. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = prayerSection, position = 2)
+	@ConfigItem(keyName = "prayerColor", name = "Color", description = "Prayer pots all glow prayer potion teal. Pick a color to use your own. Right-click the word Color and pick Reset to go back", section = prayerSection, position = 3)
 	default Color prayerColor()
 	{
 		return AlertType.PRAYER.getDefaultColor();
